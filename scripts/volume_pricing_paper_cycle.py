@@ -996,15 +996,50 @@ def main() -> int:
     try:
         result = int(engine._run())
     except Exception as exc:
-        failure_report = {
+        failure_report: dict[str, Any] = {}
+        if report_path.is_file():
+            try:
+                existing_report = json.loads(report_path.read_text(encoding="utf-8"))
+                if isinstance(existing_report, dict):
+                    failure_report.update(existing_report)
+            except (OSError, ValueError, TypeError, json.JSONDecodeError):
+                pass
+        market_cap_coverage_pass = False
+        if _MARKET_CAP_SOURCE_SUMMARY is not None:
+            cap_coverage = _MARKET_CAP_SOURCE_SUMMARY.get("coverage", {})
+            required_count = int(cap_coverage.get("required_symbols", 0))
+            resolved_count = int(cap_coverage.get("resolved_symbols", 0))
+            market_cap_coverage_pass = (
+                required_count > 0
+                and Decimal(resolved_count) / Decimal(required_count) >= Decimal("0.80")
+            )
+        failure_report.update({
             "mode": "VOLUME_PRICING_CYCLE_EXCEPTION",
-            "paper_decision_status": "FAILED",
+            "paper_decision_status": (
+                "BLOCKED_MARKET_CAP_COVERAGE"
+                if _MARKET_CAP_SOURCE_SUMMARY is not None and not market_cap_coverage_pass
+                else "FAILED"
+            ),
             "generated_at_ms": int(datetime.now(UTC).timestamp() * 1000),
-            "history_coverage_pass": False,
+            "market_cap_coverage_pass": market_cap_coverage_pass,
             "cycle_exception": f"{type(exc).__name__}: {str(exc)[:1000]}",
-        }
+        })
+        if _BOOTSTRAP_STATUS is not None:
+            bootstrap_remaining = int(_BOOTSTRAP_STATUS.get("bootstrap_remaining", 0))
+            api_failure_count = int(_BOOTSTRAP_STATUS.get("api_failure_count", 0))
+            daily_refresh_complete = bool(_BOOTSTRAP_STATUS.get("daily_refresh_complete", False))
+            failure_report.update({
+                "bootstrap_remaining": bootstrap_remaining,
+                "api_failure_count": api_failure_count,
+                "history_coverage_pass": (
+                    bootstrap_remaining == 0
+                    and api_failure_count == 0
+                    and daily_refresh_complete
+                ),
+            })
         if _STRATEGY_UNIVERSE_SUMMARY is not None:
             failure_report["strategy_universe_summary"] = _STRATEGY_UNIVERSE_SUMMARY
+            failure_report["active_cross_usdt_perpetual_count"] = _STRATEGY_UNIVERSE_SUMMARY.get("all_usdt_perpetuals")
         if _MARKET_CAP_SOURCE_SUMMARY is not None:
             failure_report["market_cap_source_summary"] = _MARKET_CAP_SOURCE_SUMMARY
         _write_json_atomic(report_path, failure_report)
