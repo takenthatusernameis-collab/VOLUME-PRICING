@@ -1,6 +1,6 @@
-# ACTIVE PAPER STATUS — VOLUME PRICING $100 USDT
+# PAPER STATUS — VOLUME PRICING $100 USDT
 
-**🟢 ACTIVE · PAPER ONLY · NO LIVE ORDERS**
+**BOOTSTRAPPING · PAPER ONLY · NO LIVE ORDERS**
 
 **Correct workflow:** [Open active workflow](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/workflows/volume-pricing-paper-cycle.yml)
 
@@ -8,8 +8,8 @@
 - Strategy generation: `volume-to-market-cap-first-positive-negative-v1`
 - Starting capital: **100.00000000 USDT**
 - Account state: **READY — WAITING FOR FIRST FINANCIAL PAPER EVENT**
-- Last report build: 2026-11-26 11:07:03 UTC
-- Latest workflow run: [45807541207](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45807541207) · run #1, attempt 1 · success · push
+- Last report build: 2026-11-26 11:19:46 UTC
+- Latest workflow run: [45808016426](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45808016426) · run #2, attempt 1 · failure · push
 - Latest processed daily candle: —
 - Latest account event: —
 - Primary execution journal: [PAPER_TRADE_JOURNAL.md](PAPER_TRADE_JOURNAL.md)
