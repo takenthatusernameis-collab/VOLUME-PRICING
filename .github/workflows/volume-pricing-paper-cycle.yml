@@ -27,7 +27,7 @@ jobs:
     env:
       MARKET_DATA_DIR: ../market-data
       PAPER_STATE_DIR: ../state
-      BOOTSTRAP_BATCH_SIZE: "50"
+      BOOTSTRAP_BATCH_SIZE: "100"
       PYTHONUNBUFFERED: "1"
       PAPER_STATE_WRITE_ENABLED: "true"
       GITHUB_REPOSITORY: ${{ github.repository }}
@@ -67,6 +67,18 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Determine UTC CoinPaprika daily cache key
+        id: marketcap-cache-key
+        shell: bash
+        run: echo "utc_date=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore private CoinPaprika market-cap cache
+        id: coinpaprika-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: market-data/data/market_cap/provider_cache.json
+          key: volume-pricing-coinpaprika-${{ steps.marketcap-cache-key.outputs.utc_date }}
+
       - name: Install MEXC paper engine and test dependencies
         shell: bash
         run: |
@@ -104,6 +116,13 @@ jobs:
             git commit -m "Append Volume Pricing MEXC data and market-cap observations"
             git push origin HEAD:market-data
           fi
+
+      - name: Save private CoinPaprika market-cap cache
+        if: always() && steps.coinpaprika-cache.outputs.cache-hit != 'true' && hashFiles('market-data/data/market_cap/provider_cache.json') != ''
+        uses: actions/cache/save@v4
+        with:
+          path: market-data/data/market_cap/provider_cache.json
+          key: volume-pricing-coinpaprika-${{ steps.marketcap-cache-key.outputs.utc_date }}
 
       - name: Refresh immutable state branch after paper cycle
         if: always()
