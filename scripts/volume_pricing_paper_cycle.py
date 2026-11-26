@@ -829,23 +829,24 @@ def main() -> int:
     # Publish the full ranking only after the shared engine confirms that the
     # entire eligible universe has current daily data and fresh tickers. During
     # bootstrap, provisional rankings never become the frozen daily snapshot.
-    if _PENDING_DECISION_SNAPSHOT is not None and report_path.is_file():
+    if report_path.is_file():
         report = json.loads(report_path.read_text(encoding="utf-8"))
-        report["market_cap_source_summary"] = _PENDING_DECISION_SNAPSHOT["market_cap_sources"]
-        if (
-            report.get("history_coverage_pass") is True
-            and int(report.get("latest_completed_daily_bar_ms", 0))
-            == int(_PENDING_DECISION_SNAPSHOT["decision_daily_bar_timestamp_ms"])
-        ):
-            decision_dir = market_data / "data" / "market_cap" / "decisions"
-            decision_path = decision_dir / (
-                f"daily_bar_{_PENDING_DECISION_SNAPSHOT['decision_daily_bar_timestamp_ms']}.json"
-            )
-            if not decision_path.exists():
-                _write_json_atomic(decision_path, _PENDING_DECISION_SNAPSHOT)
-            report["market_cap_decision_snapshot_path"] = str(
-                decision_path.relative_to(market_data)
-            )
+        if _PENDING_DECISION_SNAPSHOT is not None:
+            report["market_cap_source_summary"] = _PENDING_DECISION_SNAPSHOT["market_cap_sources"]
+            if (
+                report.get("history_coverage_pass") is True
+                and int(report.get("latest_completed_daily_bar_ms", 0))
+                == int(_PENDING_DECISION_SNAPSHOT["decision_daily_bar_timestamp_ms"])
+            ):
+                decision_dir = market_data / "data" / "market_cap" / "decisions"
+                decision_path = decision_dir / (
+                    f"daily_bar_{_PENDING_DECISION_SNAPSHOT['decision_daily_bar_timestamp_ms']}.json"
+                )
+                if not decision_path.exists():
+                    _write_json_atomic(decision_path, _PENDING_DECISION_SNAPSHOT)
+                report["market_cap_decision_snapshot_path"] = str(
+                    decision_path.relative_to(market_data)
+                )
         if _STRATEGY_UNIVERSE_SUMMARY is not None:
             report["strategy_universe_summary"] = _STRATEGY_UNIVERSE_SUMMARY
         if _MARKET_CAP_SOURCE_SUMMARY is not None:
