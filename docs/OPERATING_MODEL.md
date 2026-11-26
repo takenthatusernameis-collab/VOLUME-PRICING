@@ -11,7 +11,7 @@
 
 ## Universe
 
-Discover active MEXC cross-margin perpetuals, then restrict the strategy universe to USDT-settled crypto and unclassified token contracts. Exclude MEXC equity, commodity and FX categories because their capitalization denominators are not comparable to circulating crypto market cap. No fixed symbol allowlist or arbitrary market-cap floor. Report every contract excluded by asset class, USDT eligibility, ticker, market-cap, history or execution checks.
+Discover active MEXC cross-margin perpetuals, then restrict the strategy universe to USDT-settled crypto and unclassified token contracts. Exclude MEXC equity, commodity and FX categories, plus tokenized-stock contracts whose base symbols end in STOCK, because their capitalization denominators are not comparable to circulating crypto market cap. No fixed symbol allowlist or arbitrary market-cap floor. Report every contract excluded by asset class, USDT eligibility, ticker, market-cap, history or execution checks.
 
 ## Signal and ranking
 
