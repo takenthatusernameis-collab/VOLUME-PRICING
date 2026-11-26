@@ -750,6 +750,33 @@ def main() -> int:
 
     engine.MEXCPublicClient.instruments = usdt_instruments
 
+    # This signal and the inverse-volatility shadow path need 30 daily returns
+    # plus ATR14, not an all-time price history. Keep a 45-day rolling window.
+    original_candles = engine.MEXCPublicClient.candles
+
+    def recent_daily_candles(
+        self,
+        symbol,
+        *,
+        start_timestamp_ms,
+        end_timestamp_ms,
+        interval="Day1",
+    ):
+        if interval == "Day1":
+            start_timestamp_ms = max(
+                int(start_timestamp_ms),
+                int(end_timestamp_ms) - 45 * DAY_MS,
+            )
+        return original_candles(
+            self,
+            symbol,
+            start_timestamp_ms=start_timestamp_ms,
+            end_timestamp_ms=end_timestamp_ms,
+            interval=interval,
+        )
+
+    engine.MEXCPublicClient.candles = recent_daily_candles
+
     # Keep the CoinPaprika-only v2 paper account isolated from the initial
     # provider experiment and its immutable event chain.
     original_state_publisher = engine.GitHubStatePublisher
