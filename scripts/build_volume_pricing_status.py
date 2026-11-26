@@ -107,6 +107,14 @@ if coverage_path.is_file():
                     ][:10]
             except (OSError, ValueError, TypeError, json.JSONDecodeError):
                 pass
+    if coverage.get("latest_completed_daily_bar_ms"):
+        candle_time = datetime.fromtimestamp(
+            int(coverage["latest_completed_daily_bar_ms"]) / 1000, UTC
+        ).strftime("%Y-%m-%d %H:%M UTC")
+        markdown = markdown.replace(
+            "- Latest processed daily candle: —",
+            f"- Latest processed daily candle: {candle_time}",
+        )
     market_cap_summary = coverage.get("market_cap_source_summary") or {}
     if not market_cap_summary:
         private_cache_path = market_data / "data" / "market_cap" / "provider_cache_v2.json"
@@ -179,7 +187,7 @@ if coverage_path.is_file():
     ])
     if coverage.get("cycle_exception"):
         coverage_note += f"\n- Cycle error: `{coverage.get('cycle_exception')}`"
-    retry_report = coverage.get("entry_retry_report") or {}
+    retry_report = coverage.get("entry_retry") or coverage.get("entry_retry_report") or {}
     if retry_report:
         coverage_note += (
             f"\n- Pending pair retry: \`{retry_report.get('status', 'UNKNOWN')}\`"
