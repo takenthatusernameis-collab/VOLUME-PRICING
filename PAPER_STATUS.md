@@ -1,6 +1,6 @@
-# ACTIVE PAPER STATUS — VOLUME PRICING $100 USDT
+# EXECUTION BLOCKED — PAPER ONLY — VOLUME PRICING $100 USDT
 
-**🟢 ACTIVE · PAPER ONLY · NO LIVE ORDERS**
+**EXECUTION BLOCKED · PAPER ONLY · NO LIVE ORDERS**
 
 **Correct workflow:** [Open active workflow](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/workflows/volume-pricing-paper-cycle.yml)
 
@@ -8,16 +8,16 @@
 - Strategy generation: `volume-to-market-cap-first-positive-negative-coinpaprika-v2`
 - Starting capital: **100.00000000 USDT**
 - Account state: **INITIALIZED — FORWARD PAPER**
-- Last report build: 2026-11-26 19:35:49 UTC
-- Latest workflow run: [45884722334](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45884722334) · run #21, attempt 1 · failure · push
+- Last report build: 2026-11-26 19:38:08 UTC
+- Latest workflow run: [45885005284](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45885005284) · run #22, attempt 1 · failure · push
 - Latest processed daily candle: —
-- Latest account event: 2026-11-26 19:35:23 UTC
+- Latest account event: 2026-11-26 19:37:46 UTC
 - Primary execution journal: [PAPER_TRADE_JOURNAL.md](PAPER_TRADE_JOURNAL.md)
 
 
 ## MEXC universe and data coverage
 
-- Coverage state: **READY**
+- Coverage state: **EXECUTION_BLOCKED**
 - Active USDT-settled cross-margin perpetuals: not refreshed in snapshot mode
 - Strategy-eligible crypto/unclassified contracts: —
 - Excluded tokenized-stock suffix contracts (overlaps category counts): —
@@ -37,12 +37,30 @@
 Numerator: MEXC rolling 24-hour USDT quote turnover. Denominator: circulating market capitalization in USD.
 
 **Highest-ranked positive 24-hour change candidates (long side):**
-- No eligible positive-change candidate.
+- ANTHROPIC_USDT: ratio=786.9282990471105548999670127%, MEXC 24h change=0.0045, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
+- LAB_USDT: ratio=41.58089691685163016614432339%, MEXC 24h change=0.0105, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
+- INIT_USDT: ratio=41.17441566171532285569618224%, MEXC 24h change=0.0344, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
+- MANTRA_USDT: ratio=34.86486874065990902702984139%, MEXC 24h change=0.0099, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
+- GUA_USDT: ratio=26.62341278729432845337195529%, MEXC 24h change=0.0153, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
+- BIGTIME_USDT: ratio=23.35768918948540692749272902%, MEXC 24h change=0.0099, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
+- AKE_USDT: ratio=20.99075692062352451628968150%, MEXC 24h change=0.2365, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
+- MMT_USDT: ratio=15.57635294708743503599278533%, MEXC 24h change=0.0246, market-cap source=coingecko match=exact_coingecko_top_2000
+- GUN_USDT: ratio=12.52236188136651931577935806%, MEXC 24h change=0.0007, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
+- ME_USDT: ratio=12.38982915175821657026476009%, MEXC 24h change=0.0433, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
 
 **Highest-ranked negative 24-hour change candidates (short side):**
-- No eligible negative-change candidate.
+- BULLA_USDT: ratio=128.4386327457821085596052024%, MEXC 24h change=-0.2511, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
+- EVAA_USDT: ratio=127.5156929939434583609500498%, MEXC 24h change=-0.1547, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
+- SPY_USDT: ratio=123.8565944085048324431746741%, MEXC 24h change=-0.0002, market-cap source=coingecko match=exact_coingecko_top_2000
+- BLESS_USDT: ratio=61.40940470526122240766447873%, MEXC 24h change=-0.0833, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
+- MOVE_USDT: ratio=52.24942906552411516466737826%, MEXC 24h change=-0.0227, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
+- DCTY_USDT: ratio=33.02310523427023900297110404%, MEXC 24h change=-0.0326, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
+- SI_USDT: ratio=26.01741201242544143269171741%, MEXC 24h change=-0.0179, market-cap source=coingecko match=exact_coingecko_top_2000
+- ACE_USDT: ratio=23.38694998544708479353788505%, MEXC 24h change=-0.005, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
+- SSV_USDT: ratio=14.88356978307003717811781508%, MEXC 24h change=-0.0043, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
+- LISTA_USDT: ratio=13.98481304357618542012252427%, MEXC 24h change=-0.0058, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
 
-Portfolio transitions remain blocked until the complete eligible MEXC USDT universe passes the market-data gate.
+The daily ranking and selected pair remain frozen for this UTC candle. Five-minute snapshots retry the same pair against fresh public order-book depth; no lower-ranked substitute is opened.
 
 ## Current performance
 
@@ -68,7 +86,7 @@ Portfolio transitions remain blocked until the complete eligible MEXC USDT unive
 
 | Session start (UTC) | Starting NAV | Latest NAV | Max drawdown | Marks |
 |---|---:|---:|---:|---:|
-| 2026-11-26 00:00:00 UTC | 100.00000000 | 100.00000000 | +0.000% | 12 |
+| 2026-11-26 00:00:00 UTC | 100.00000000 | 100.00000000 | +0.000% | 13 |
 
 ## Open positions
 
