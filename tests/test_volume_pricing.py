@@ -36,7 +36,7 @@ def caps(**values: str) -> dict[str, dict]:
     }
 
 
-def test_ranking_uses_turnover_to_market_cap_then_direction(monkeypatch, tmp_path):
+def test_ranking_uses_turnover_to_market_cap_then_direction(monkeypatch):
     rows = [
         instrument(1, "AAA_USDT", "AAA"),
         instrument(2, "BBB_USDT", "BBB"),
@@ -69,8 +69,7 @@ def test_ranking_uses_turnover_to_market_cap_then_direction(monkeypatch, tmp_pat
     assert result.instruments_by_key["mexc:3"]["volume_to_market_cap_ratio"] == "0.3"
 
 
-def test_unmatched_market_cap_is_excluded_without_symbol_guessing(monkeypatch, tmp_path):
-    monkeypatch.setattr(strategy, "_cache_path", lambda: tmp_path / "provider_cache.json")
+def test_unmatched_market_cap_is_excluded_without_symbol_guessing(monkeypatch):
     rows = [
         instrument(1, "AAA_USDT", "AAA"),
         instrument(2, "BBB_USDT", "BBB"),
@@ -86,7 +85,7 @@ def test_unmatched_market_cap_is_excluded_without_symbol_guessing(monkeypatch, t
     histories = {iid: [{"timestamp_ms": stamp, "close": "1"}] for iid in (1, 2, 3, 4, 5)}
     monkeypatch.setattr(
         strategy,
-        "_load_market_cap_cache",
+        "_load_market_cap_records",
         lambda required, now: (market_caps, {"coverage": {"resolved_symbols": 4, "required_symbols": 5}}),
     )
 
@@ -101,8 +100,7 @@ def test_unmatched_market_cap_is_excluded_without_symbol_guessing(monkeypatch, t
     assert any("BBB_USDT:MISSING_OR_AMBIGUOUS_MARKET_CAP:BBB" == item for item in result.excluded)
 
 
-def test_non_usdt_contracts_never_enter_the_strategy_universe(monkeypatch, tmp_path):
-    monkeypatch.setattr(strategy, "_cache_path", lambda: tmp_path / "provider_cache.json")
+def test_non_usdt_contracts_never_enter_the_strategy_universe(monkeypatch):
     rows = [instrument(1, "AAA_USDT", "AAA")]
     stamp = 1_799_913_600_000
     histories = {1: [{"timestamp_ms": stamp, "close": "1"}]}
@@ -112,7 +110,7 @@ def test_non_usdt_contracts_never_enter_the_strategy_universe(monkeypatch, tmp_p
     other["usdt_account_eligible"] = False
     monkeypatch.setattr(
         strategy,
-        "_load_market_cap_cache",
+        "_load_market_cap_records",
         lambda required, now: (caps(AAA="100"), {"coverage": {"resolved_symbols": 1, "required_symbols": 1}}),
     )
 
