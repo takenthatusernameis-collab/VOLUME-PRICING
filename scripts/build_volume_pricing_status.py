@@ -84,6 +84,8 @@ if coverage_path.is_file():
         "",
         f"- Coverage state: **{coverage_state}**",
         f"- Active USDT-settled cross-margin perpetuals: {coverage.get('active_cross_usdt_perpetual_count', '—')}",
+        f"- Strategy-eligible crypto/unclassified contracts: {((coverage.get('strategy_universe_summary') or {}).get('eligible_crypto_and_unclassified', '—'))}",
+        f"- Excluded non-crypto categories: {((coverage.get('strategy_universe_summary') or {}).get('excluded_by_category', {}))}",
         f"- MEXC tickers received: {coverage.get('ticker_coverage', '—')}",
         f"- Missing tickers: {coverage.get('missing_ticker_count', '—')}",
         f"- History bootstrap remaining: {coverage.get('bootstrap_remaining', '—')}",
