@@ -35,7 +35,7 @@ Both start at 100 USDT. The primary path uses the proven MEXC paper engine's boo
 
 A market-cap provider's global 24-hour volume is **not** the numerator. The numerator is MEXC's own 24-hour USDT contract turnover. The denominator is the provider's circulating market capitalization in USD. USDT is treated as approximately USD 1:1 for this ratio.
 
-Symbols are joined conservatively. Ambiguous symbols, missing/zero market caps, stale market-cap observations, stale tickers and invalid turnover are excluded and reported. A symbol match is not proof of contract identity; the implementation does not guess among duplicate symbols.
+Symbols are joined conservatively. Ambiguous symbols, missing/zero market caps, stale market-cap observations, stale tickers and invalid turnover are excluded and reported. A portfolio decision requires at least 80% of the distinct eligible MEXC base-asset symbols to have fresh, unambiguous market-cap matches; otherwise the cycle fails closed. A symbol match is not proof of contract identity; the implementation does not guess among duplicate symbols.
 
 Market-cap observations are captured and persisted at decision time. This is a forward paper simulation, not a backtest using today's market capitalization for historical dates.
 
