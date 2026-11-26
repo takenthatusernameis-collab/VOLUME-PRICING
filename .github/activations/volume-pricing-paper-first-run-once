@@ -32,3 +32,5 @@ Correct the CoinPaprika multiplier alias continuation and rerun the complete pro
 Align the multiplier-alias assertion with its explicit provider label and rerun all nine tests.
 
 Update the normalized-name alias expectation to its explicit CoinPaprika match label; retry provider run.
+
+Fix the journal's binary-float rejection and reuse the successful private dual-provider cache.
