@@ -55,6 +55,14 @@ markdown = (
     .replace("high-low-paper-cycle.yml", "volume-pricing-paper-cycle.yml")
     .replace("ATH/ATL", "volume-to-market-cap")
     .replace("High-Low Equal-Notional Strategy", "Volume Pricing Equal-Notional Strategy")
+    .replace(
+        "The v3 $50 USDT generation and its preliminary snapshots are archived and excluded from this account’s NAV, returns, equity curves and metrics. The immutable event ledger remains intact.",
+        "The initial provider-validation attempt is isolated from this CoinPaprika-only v2 account. The current immutable paper ledger is on the state-coinpaprika-v2 branch."
+    )
+    .replace(
+        "This is the compact live status page. The former detailed v3 report is retained under archive/2026-11-18/ for audit purposes only.",
+        "This is the current live status page for the CoinPaprika-only v2 paper simulation."
+    )
 )
 if "READY — WAITING FOR FIRST FINANCIAL PAPER EVENT" in markdown:
     markdown = markdown.replace("# ACTIVE PAPER STATUS", "# PAPER STATUS")
