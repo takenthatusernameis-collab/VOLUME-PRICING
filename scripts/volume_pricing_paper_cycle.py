@@ -524,6 +524,7 @@ def rank_volume_pricing_universe(
     **_: Any,
 ) -> MEXCRankings:
     """Rank MEXC USDT perps by 24h turnover / circulating USD market cap."""
+    global _PENDING_DECISION_SNAPSHOT
     if not nav.is_finite() or nav <= 0:
         raise ValueError("nav must be a finite positive Decimal")
     if as_of_timestamp_ms <= 0:
@@ -541,7 +542,6 @@ def rank_volume_pricing_universe(
     }
     now_ms = int(datetime.now(UTC).timestamp() * 1000)
     if not _universe_history_ready(eligible, histories, tickers, as_of_timestamp_ms):
-        global _PENDING_DECISION_SNAPSHOT
         _PENDING_DECISION_SNAPSHOT = None
         return MEXCRankings(
             research_longs=[],
@@ -677,7 +677,6 @@ def rank_volume_pricing_universe(
         ),
         "excluded": excluded,
     }
-    global _PENDING_DECISION_SNAPSHOT
     _PENDING_DECISION_SNAPSHOT = decision_snapshot
 
     print(
