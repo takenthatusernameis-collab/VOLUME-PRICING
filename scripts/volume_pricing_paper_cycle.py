@@ -560,7 +560,7 @@ def _load_market_cap_records(
             "coingecko_rows_received": len(coingecko_rows),
             "coingecko_pages_requested": coingecko_calls,
             "coingecko_request_error": coingecko_error,
-            "coingecko_request_interval_seconds": COINGECKO_REQUEST_INTERVAL_SECONDS,
+            "coingecko_request_interval_ms": int(COINGECKO_REQUEST_INTERVAL_SECONDS * 1000),
             "individual_ticker_lookups": individual_calls,
             "coinpaprika_single_lookup_plan_limited": coinpaprika_single_lookup_plan_limited,
             "coinpaprika_api_calls_used": coinpaprika_calls_used,
