@@ -1,0 +1,10 @@
+{
+  "api_calls_used": 37,
+  "completed_at_ms": 1795720450531,
+  "decision_date": "2026-11-26",
+  "provider": "coinpaprika",
+  "required_symbols": 611,
+  "resolved_symbols": 460,
+  "started_at_ms": 1795720441214,
+  "status": "COMPLETED"
+}
