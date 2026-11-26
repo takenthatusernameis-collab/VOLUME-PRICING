@@ -8,10 +8,10 @@
 - Strategy generation: `volume-to-market-cap-first-positive-negative-coinpaprika-v2`
 - Starting capital: **100.00000000 USDT**
 - Account state: **INITIALIZED — FORWARD PAPER**
-- Last report build: 2026-11-26 19:38:08 UTC
-- Latest workflow run: [45885005284](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45885005284) · run #22, attempt 1 · failure · push
-- Latest processed daily candle: —
-- Latest account event: 2026-11-26 19:37:46 UTC
+- Last report build: 2026-11-26 19:39:42 UTC
+- Latest workflow run: [45885195014](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45885195014) · run #23, attempt 1 · failure · push
+- Latest processed daily candle: 2026-11-25 00:00 UTC
+- Latest account event: 2026-11-26 19:39:16 UTC
 - Primary execution journal: [PAPER_TRADE_JOURNAL.md](PAPER_TRADE_JOURNAL.md)
 
 
@@ -37,6 +37,8 @@
 Numerator: MEXC rolling 24-hour USDT quote turnover. Denominator: circulating market capitalization in USD.
 
 **Highest-ranked positive 24-hour change candidates (long side):**
+- Pending pair retry: \`RETRY_EXECUTION_BLOCKED\` (attempt 3)
+- Execution check: MEXCExecutionUnavailable: No candidate pair passed independent NAV sizing and public-depth checks; 1 fill attempt(s) failed; last failure: BULLA_USDT: ExecutionImpactExceeded: Modeled shortfall 20.07119140917112859322186100 bp
 - ANTHROPIC_USDT: ratio=786.9282990471105548999670127%, MEXC 24h change=0.0045, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
 - LAB_USDT: ratio=41.58089691685163016614432339%, MEXC 24h change=0.0105, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
 - INIT_USDT: ratio=41.17441566171532285569618224%, MEXC 24h change=0.0344, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
@@ -86,7 +88,7 @@ The daily ranking and selected pair remain frozen for this UTC candle. Five-minu
 
 | Session start (UTC) | Starting NAV | Latest NAV | Max drawdown | Marks |
 |---|---:|---:|---:|---:|
-| 2026-11-26 00:00:00 UTC | 100.00000000 | 100.00000000 | +0.000% | 13 |
+| 2026-11-26 00:00:00 UTC | 100.00000000 | 100.00000000 | +0.000% | 14 |
 
 ## Open positions
 
