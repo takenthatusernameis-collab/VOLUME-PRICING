@@ -20,3 +20,5 @@ Bootstrap batch 8; publish truthful BOOTSTRAPPING status until the full universe
 Bootstrap batch 9; continue the serialized full-universe history preparation.
 
 Bootstrap batch 10; keep the full eligible universe progressing toward readiness.
+
+Bootstrap batch 11; finish the remaining eligible MEXC market-history set.
