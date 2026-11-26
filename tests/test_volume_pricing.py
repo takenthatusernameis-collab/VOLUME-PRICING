@@ -28,6 +28,7 @@ def ticker(turnover: str, change: str, stamp: int = 1_800_000_000_000) -> dict:
 def caps(**values: str) -> dict[str, dict]:
     return {
         symbol: {
+            "symbol": symbol,
             "market_cap_usd": market_cap,
             "provider": "fixture",
             "source_id": symbol,
@@ -73,6 +74,7 @@ def test_ranking_uses_turnover_to_market_cap_then_direction(monkeypatch):
 
 
 def test_unmatched_market_cap_is_excluded_without_symbol_guessing(monkeypatch):
+    monkeypatch.setattr(strategy, "_universe_history_ready", lambda *args: True)
     rows = [
         instrument(1, "AAA_USDT", "AAA"),
         instrument(2, "BBB_USDT", "BBB"),
@@ -104,6 +106,7 @@ def test_unmatched_market_cap_is_excluded_without_symbol_guessing(monkeypatch):
 
 
 def test_non_usdt_contracts_never_enter_the_strategy_universe(monkeypatch):
+    monkeypatch.setattr(strategy, "_universe_history_ready", lambda *args: True)
     rows = [instrument(1, "AAA_USDT", "AAA")]
     stamp = 1_799_913_600_000
     histories = {1: [{"timestamp_ms": stamp, "close": "1"}]}
