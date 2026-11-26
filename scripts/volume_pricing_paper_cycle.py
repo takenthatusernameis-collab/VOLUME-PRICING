@@ -433,6 +433,21 @@ def main() -> int:
         return original_instruments(self, usdt_only=True)
 
     engine.MEXCPublicClient.instruments = usdt_instruments
+
+    # Keep the CoinPaprika-only v2 paper account isolated from the initial
+    # provider experiment and its immutable event chain.
+    original_state_publisher = engine.GitHubStatePublisher
+
+    def volume_pricing_state_publisher(repository_full_name, token, **kwargs):
+        kwargs.pop("branch", None)
+        return original_state_publisher(
+            repository_full_name,
+            token,
+            branch="state-coinpaprika-v2",
+            **kwargs,
+        )
+
+    engine.GitHubStatePublisher = volume_pricing_state_publisher
     market_data = Path(os.environ.get("MARKET_DATA_DIR", "../market-data"))
     report_path = market_data / "data" / "reports" / "mexc" / "latest_cycle.json"
     try:
