@@ -360,9 +360,12 @@ def _load_market_cap_records(
             try:
                 record = _fetch_coinpaprika_single_ticker(coin_id)
             except MarketCapDataError as exc:
-                if "HTTP 429" in str(exc):
+                message = str(exc)
+                if not any(code in message for code in ("HTTP 404",)):
+                    # Stop immediately on rate-limit, auth/plan, server or network
+                    # failures; do not burn the remaining monthly call budget.
                     raise
-                request_errors.append(f"{base_symbol}:{str(exc)[:180]}")
+                request_errors.append(f"{base_symbol}:{message[:180]}")
                 missing.append(base_symbol)
                 continue
             if record is None or record.get("symbol") != source_symbol:
