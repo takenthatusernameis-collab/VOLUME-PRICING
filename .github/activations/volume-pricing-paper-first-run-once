@@ -40,3 +40,5 @@ Fix the shared-engine report schema and rerun the first forward portfolio decisi
 Use the persisted daily decision watermark for snapshot-only retries and preserve provider coverage in status.
 
 Refresh snapshot-only retry diagnostics and status from the frozen daily ranking.
+
+Publish the execution-blocked pending-entry details and UTC daily-bar watermark in the status page.
