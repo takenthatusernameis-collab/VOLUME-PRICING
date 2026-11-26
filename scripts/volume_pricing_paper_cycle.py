@@ -210,7 +210,7 @@ def _fetch_coinlore() -> list[dict[str, Any]]:
             break
         if len(rows) < limit and total is None:
             break
-        if page < 24:
+        if page < 199:
             time.sleep(1.05)
     if not output:
         raise MarketCapDataError("CoinLore returned no positive market caps")
