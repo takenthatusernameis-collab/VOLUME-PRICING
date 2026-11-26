@@ -56,6 +56,13 @@ markdown = (
     .replace("ATH/ATL", "volume-to-market-cap")
     .replace("High-Low Equal-Notional Strategy", "Volume Pricing Equal-Notional Strategy")
 )
+if "READY — WAITING FOR FIRST FINANCIAL PAPER EVENT" in markdown:
+    markdown = markdown.replace("# ACTIVE PAPER STATUS", "# PAPER STATUS")
+    markdown = markdown.replace(
+        "**🟢 ACTIVE · PAPER ONLY · NO LIVE ORDERS**",
+        "**BOOTSTRAPPING · PAPER ONLY · NO LIVE ORDERS**",
+    )
+
 journal = status.render_primary_trade_journal(
     state_dir,
     generated_at_ms=generated_at_ms,
