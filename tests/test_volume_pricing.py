@@ -12,6 +12,7 @@ def instrument(iid: int, symbol: str, base: str) -> dict:
         "quote_asset": "USDT",
         "settlement_asset": "USDT",
         "usdt_account_eligible": True,
+        "category": "crypto",
     }
 
 
