@@ -14,3 +14,5 @@ Bootstrap batch 4; refresh status after v3-template cleanup.
 Continue bootstrap after adding bounded state-ledger read-after-write verification retries.
 
 Bootstrap batch 7; run current source and workflow revisions with raw provider cache excluded from artifacts.
+
+Bootstrap batch 8; publish truthful BOOTSTRAPPING status until the full universe passes.
