@@ -23,7 +23,8 @@ At the first eligible run after a newly completed UTC daily candle:
 4. Sort all matched assets descending by this ratio. Tie-break deterministically by MEXC symbol and instrument ID.
 5. Filter this single ranking by the sign of MEXC's rolling 24-hour price change. The first positive-change asset is the long; the first negative-change asset is the short.
 6. Only those first two candidates are executable. If either cannot be executed under the paper engine's book/lot/shortfall checks, do not silently fall through to a lower-ranked symbol.
-7. Require at least 80% fresh, unambiguous market-cap coverage across distinct eligible base-asset symbols; otherwise fail closed.\n8. Persist the ranking, market-cap observations, exclusions, provider metadata and decision timestamp.
+7. Require at least 80% fresh, unambiguous market-cap coverage across distinct eligible base-asset symbols; otherwise fail closed.
+8. Persist the ranking, market-cap observations, exclusions, provider metadata and decision timestamp.
 
 The ranking order is not the long/short signal by itself: the price-change sign determines direction.
 
