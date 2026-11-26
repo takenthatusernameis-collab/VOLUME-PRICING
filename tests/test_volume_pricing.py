@@ -169,6 +169,7 @@ def test_coinpaprika_duplicate_stale_and_multiplier_alias_resolution(monkeypatch
         }
 
     monkeypatch.setattr(strategy, "_fetch_coinpaprika_single_ticker", single_ticker)
+    monkeypatch.setattr(strategy, "_fetch_coingecko_market_pages", lambda: [])
 
     resolved, report = strategy._load_market_cap_records(
         {"AAA", "BBB", "CCC", "1000PEPE", "FILECOIN"}, now
@@ -243,3 +244,55 @@ def test_state_verification_does_not_retry_integrity_errors():
 
     assert calls["verify"] == 1
     assert calls["sleep"] == []
+
+
+def test_coingecko_keyless_market_pages_fill_coinpaprika_gaps(monkeypatch, tmp_path):
+    now = 1_800_000_000_000
+    cache_path = tmp_path / "provider_cache_v2.json"
+    attempt_path = tmp_path / "daily_attempt_v2.json"
+    monkeypatch.setattr(
+        strategy, "_market_cap_paths", lambda: (cache_path, attempt_path)
+    )
+    monkeypatch.setattr(strategy, "COINGECKO_MARKET_PAGES", 1)
+    monkeypatch.setattr(
+        strategy,
+        "_fetch_coinpaprika_top_tickers",
+        lambda: [{
+            "symbol": "AAA", "name": "AAA", "market_cap_usd": "100",
+            "source_id": "aaa-paprika", "provider": "coinpaprika",
+            "source_updated_ms": now,
+        }],
+    )
+    monkeypatch.setattr(
+        strategy,
+        "_fetch_coinpaprika_coin_catalogue",
+        lambda: [{"id": "bbb-paprika", "symbol": "BBB", "name": "BBB"}],
+    )
+    monkeypatch.setattr(
+        strategy,
+        "_fetch_coingecko_market_pages",
+        lambda: [{
+            "symbol": "BBB", "name": "BBB", "market_cap_usd": "200",
+            "source_id": "bbb-gecko", "provider": "coingecko",
+            "source_updated_ms": now,
+        }],
+    )
+
+    def forbidden_single_lookup(_coin_id):
+        raise AssertionError("CoinGecko should fill BBB without an extra CoinPaprika call")
+
+    monkeypatch.setattr(
+        strategy, "_fetch_coinpaprika_single_ticker", forbidden_single_lookup
+    )
+
+    resolved, report = strategy._load_market_cap_records({"AAA", "BBB"}, now)
+
+    assert set(resolved) == {"AAA", "BBB"}
+    assert resolved["AAA"]["provider"] == "coinpaprika"
+    assert resolved["BBB"]["provider"] == "coingecko"
+    assert resolved["BBB"]["symbol_match_type"] == "exact_coingecko_top_2000"
+    assert report["provider"] == "coinpaprika+coingecko"
+    assert report["coverage"]["resolved_symbols"] == 2
+    assert report["coingecko_api_calls_used"] == 1
+    assert json.loads(cache_path.read_text())["cache_version"] == 2
+    assert json.loads(attempt_path.read_text())["status"] == "COMPLETED"
