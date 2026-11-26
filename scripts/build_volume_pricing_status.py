@@ -86,6 +86,12 @@ coverage_note = ""
 if coverage_path.is_file():
     coverage = json.loads(coverage_path.read_text(encoding="utf-8"))
     coverage_state = "READY" if coverage.get("history_coverage_pass") else "BOOTSTRAPPING"
+    if not coverage.get("history_coverage_pass"):
+        markdown = markdown.replace("# ACTIVE PAPER STATUS", "# BOOTSTRAPPING PAPER STATUS")
+        markdown = markdown.replace(
+            "**🟢 ACTIVE · PAPER ONLY · NO LIVE ORDERS**",
+            "**BOOTSTRAPPING · PAPER ONLY · NO LIVE ORDERS**",
+        )
     coverage_note = "\n".join([
         "",
         "## MEXC universe and data coverage",
