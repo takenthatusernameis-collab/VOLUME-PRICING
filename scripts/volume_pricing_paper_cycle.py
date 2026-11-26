@@ -182,7 +182,7 @@ def _fetch_coinlore() -> list[dict[str, Any]]:
     start = 0
     limit = 1000
     total: int | None = None
-    for page in range(25):
+    for page in range(200):
         query = urlencode({"start": start, "limit": limit})
         payload = _http_json(f"https://api.coinlore.net/api/tickers/?{query}")
         if not isinstance(payload, dict) or not isinstance(payload.get("data"), list):
@@ -381,6 +381,16 @@ def rank_volume_pricing_universe(
     }
     now_ms = int(datetime.now(UTC).timestamp() * 1000)
     market_caps, source_report = _load_market_cap_cache(symbols, now_ms)
+    coverage = source_report["coverage"]
+    coverage_fraction = (
+        Decimal(coverage["resolved_symbols"]) / Decimal(coverage["required_symbols"])
+        if coverage["required_symbols"] else Decimal("0")
+    )
+    if coverage_fraction < Decimal("0.80"):
+        raise MarketCapDataError(
+            "Fresh, unambiguous market-cap coverage is below the 80% safety gate: "
+            f"{coverage['resolved_symbols']}/{coverage['required_symbols']} symbols"
+        )
 
     ticker_stamps = [
         int(ticker.get("timestamp_ms", 0))
