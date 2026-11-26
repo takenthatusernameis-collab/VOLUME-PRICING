@@ -124,3 +124,24 @@ def test_non_usdt_contracts_never_enter_the_strategy_universe(monkeypatch):
 
     assert [row.symbol for row in result.research_longs] == ["mexc:1"]
     assert result.research_shorts == []
+
+
+def test_coinpaprika_duplicate_and_stale_symbols_are_rejected(monkeypatch):
+    now = 1_800_000_000_000
+    rows = [
+        {"symbol": "AAA", "market_cap_usd": "100", "provider": "coinpaprika",
+         "source_updated_ms": now, "source_id": "aaa", "name": "AAA"},
+        {"symbol": "BBB", "market_cap_usd": "100", "provider": "coinpaprika",
+         "source_updated_ms": now, "source_id": "bbb-1", "name": "BBB One"},
+        {"symbol": "BBB", "market_cap_usd": "200", "provider": "coinpaprika",
+         "source_updated_ms": now, "source_id": "bbb-2", "name": "BBB Two"},
+        {"symbol": "CCC", "market_cap_usd": "300", "provider": "coinpaprika",
+         "source_updated_ms": now - 7 * 60 * 60 * 1000, "source_id": "ccc", "name": "CCC"},
+    ]
+    monkeypatch.setattr(strategy, "_fetch_coinpaprika", lambda: rows)
+
+    resolved, report = strategy._load_market_cap_records({"AAA", "BBB", "CCC"}, now)
+
+    assert set(resolved) == {"AAA"}
+    assert report["coverage"]["ambiguous_symbols"] == ["BBB"]
+    assert report["coverage"]["stale_symbols"] == ["CCC"]
