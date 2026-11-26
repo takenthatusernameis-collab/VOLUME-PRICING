@@ -30,3 +30,5 @@ Fix and retest CoinPaprika denomination alias fallback; then evaluate combined p
 Correct the CoinPaprika multiplier alias continuation and rerun the complete provider coverage tests.
 
 Align the multiplier-alias assertion with its explicit provider label and rerun all nine tests.
+
+Update the normalized-name alias expectation to its explicit CoinPaprika match label; retry provider run.
