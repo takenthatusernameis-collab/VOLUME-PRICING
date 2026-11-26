@@ -22,3 +22,5 @@ Bootstrap batch 9; continue the serialized full-universe history preparation.
 Bootstrap batch 10; keep the full eligible universe progressing toward readiness.
 
 Bootstrap batch 11; finish the remaining eligible MEXC market-history set.
+
+Provider expansion: CoinGecko keyless 2,000-asset paginated supplement; versioned private cache; preserve full failure diagnostics.
