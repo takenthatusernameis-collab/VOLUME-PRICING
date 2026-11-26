@@ -8,10 +8,10 @@
 - Strategy generation: `volume-to-market-cap-first-positive-negative-coinpaprika-v2`
 - Starting capital: **100.00000000 USDT**
 - Account state: **INITIALIZED — FORWARD PAPER**
-- Last report build: 2026-11-26 20:10:46 UTC
-- Latest workflow run: [45889037073](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45889037073) · run #27, attempt 1 · success · workflow_dispatch
+- Last report build: 2026-11-26 20:11:25 UTC
+- Latest workflow run: [45889056100](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45889056100) · run #28, attempt 1 · success · workflow_dispatch
 - Latest processed daily candle: 2026-11-25 00:00 UTC
-- Latest account event: 2026-11-26 20:10:30 UTC
+- Latest account event: 2026-11-26 20:11:09 UTC
 - Primary execution journal: [PAPER_TRADE_JOURNAL.md](PAPER_TRADE_JOURNAL.md)
 
 
@@ -67,15 +67,15 @@ The daily ranking is frozen for this UTC candle. Five-minute runs update paper N
 | Metric | Value |
 |---|---:|
 | Initial capital | 100.00000000 USDT |
-| **NAV** | **99.51752180 USDT** |
-| Total return | -0.482% |
+| **NAV** | **101.30686180 USDT** |
+| Total return | +1.307% |
 | Cash | 99.98010180 USDT |
-| Unrealized P&L | -0.46258000 USDT |
+| Unrealized P&L | +1.32676000 USDT |
 | Fees paid | 0.01989820 USDT |
 | Confirmed funding | +0.00000000 USDT |
-| Gross exposure | 2.009× NAV |
-| Net exposure | 0.001× NAV |
-| Current drawdown from risk-window peak | -0.207% |
+| Gross exposure | 1.954× NAV |
+| Net exposure | 0.018× NAV |
+| Current drawdown from risk-window peak | +0.000% |
 | Lifetime / cross-session maximum drawdown | -0.482% |
 | Worst risk-session maximum drawdown | -0.207% |
 | Sharpe ratio | Unavailable — sample gate not met |
@@ -87,14 +87,14 @@ The daily ranking is frozen for this UTC candle. Five-minute runs update paper N
 | Session start (UTC) | Starting NAV | Latest NAV | Max drawdown | Marks |
 |---|---:|---:|---:|---:|
 | 2026-11-26 00:00:00 UTC | 100.00000000 | 100.00000000 | +0.000% | 15 |
-| 2026-11-26 20:09:16 UTC | 99.72424180 | 99.51752180 | -0.207% | 1 |
+| 2026-11-26 20:09:16 UTC | 99.72424180 | 101.30686180 | -0.207% | 2 |
 
 ## Open positions
 
 | Symbol | Side | Quantity | Entry price | Mark | Notional (USDT) |
 |---|---|---:|---:|---:|---:|
-| ANTHROPIC_USDT | long | 1.186 | 84.32 | 84.29 | 99.967940 |
-| BULLA_USDT | short | 3050 | 0.03262 | 0.03276 | 99.918000 |
+| ANTHROPIC_USDT | long | 1.186 | 84.32 | 84.23 | 99.896780 |
+| BULLA_USDT | short | 3050 | 0.03262 | 0.03215 | 98.057500 |
 
 ## Primary path — equal exposure
 
