@@ -379,6 +379,8 @@ def _load_market_cap_records(
         ambiguous: list[str] = []
         stale: list[str] = []
         missing: list[str] = []
+        coingecko_ambiguous_candidates: set[str] = set()
+        coingecko_stale_candidates: set[str] = set()
         pending: dict[str, tuple[str, str, str]] = {}
 
         def resolve_coingecko(
@@ -388,14 +390,14 @@ def _load_market_cap_records(
             source_symbol: str,
         ) -> bool:
             if len(matches) > 1:
-                ambiguous.append(base_symbol)
-                return True
+                coingecko_ambiguous_candidates.add(base_symbol)
+                return False
             if len(matches) != 1:
                 return False
             record = dict(matches[0])
             if not _record_is_fresh(record, now_ms):
-                stale.append(base_symbol)
-                return True
+                coingecko_stale_candidates.add(base_symbol)
+                return False
             record["source_symbol"] = source_symbol
             record["symbol_match_type"] = match_type
             resolved[base_symbol] = record
@@ -521,6 +523,8 @@ def _load_market_cap_records(
             record["symbol_match_type"] = match_type
             resolved[base_symbol] = record
 
+        ambiguous.extend(sorted(coingecko_ambiguous_candidates - set(resolved)))
+        stale.extend(sorted(coingecko_stale_candidates - set(resolved)))
         coverage = {
             "required_symbols": len(required),
             "resolved_symbols": len(resolved),
