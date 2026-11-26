@@ -23,8 +23,8 @@ sys.path.insert(0, str(ENGINE_ROOT / "src"))
 
 from high_vs_low.mexc_paper import Candidate, MEXCRankings
 
-ACCOUNT_ID = "mexc-usdt-forward-volume-pricing-100usdt-v1"
-STRATEGY_ID = "volume-to-market-cap-first-positive-negative-v1"
+ACCOUNT_ID = "mexc-usdt-forward-volume-pricing-coinpaprika-100usdt-v2"
+STRATEGY_ID = "volume-to-market-cap-first-positive-negative-coinpaprika-v2"
 INITIAL_CAPITAL = Decimal("100")
 MAX_SOURCE_AGE_MS = 6 * 60 * 60 * 1000
 MAX_TICKER_SPREAD_MS = 5 * 60 * 1000
