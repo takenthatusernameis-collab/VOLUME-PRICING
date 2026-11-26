@@ -121,8 +121,8 @@ jobs:
         if: always() && steps.coinpaprika-cache.outputs.cache-hit != 'true' && hashFiles('market-data/data/market_cap/provider_cache_v2.json') != ''
         uses: actions/cache/save@v4
         with:
-          path: market-data/data/market_cap/provider_cache.json
-          key: volume-pricing-coinpaprika-${{ steps.marketcap-cache-key.outputs.utc_date }}
+          path: market-data/data/market_cap/provider_cache_v2.json
+          key: volume-pricing-marketcap-v2-${{ steps.marketcap-cache-key.outputs.utc_date }}
 
       - name: Refresh immutable state branch after paper cycle
         if: always()
