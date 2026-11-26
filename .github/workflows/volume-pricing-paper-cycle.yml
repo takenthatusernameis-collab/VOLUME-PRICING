@@ -1,0 +1,174 @@
+name: "VOLUME PRICING — MEXC USDT PAPER ONLY — DAILY CLOSE / FIVE-MINUTE SNAPSHOTS"
+
+run-name: "Volume Pricing paper cycle — ${{ github.event_name }} — run #${{ github.run_number }}"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/activations/volume-pricing-paper-first-run-once"
+  schedule:
+    # Intended monitoring target: every five minutes. GitHub Actions is best-effort.
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: volume-pricing-mexc-paper-state-single-writer
+  cancel-in-progress: false
+
+jobs:
+  cycle:
+    if: ${{ github.event_name != 'push' || contains(github.event.head_commit.message, '[VOLUME_PRICING_BOOTSTRAP]') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      MARKET_DATA_DIR: ../market-data
+      PAPER_STATE_DIR: ../state
+      BOOTSTRAP_BATCH_SIZE: "150"
+      PYTHONUNBUFFERED: "1"
+      PAPER_STATE_WRITE_ENABLED: "true"
+      GITHUB_REPOSITORY: ${{ github.repository }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Check out Volume Pricing strategy repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: strategy
+          fetch-depth: 0
+
+      - name: Check out proven MEXC public-data paper engine
+        uses: actions/checkout@v4
+        with:
+          repository: takenthatusernameis-collab/high-vs-low
+          ref: main
+          path: engine
+          fetch-depth: 1
+
+      - name: Check out persistent MEXC market-data branch
+        uses: actions/checkout@v4
+        with:
+          ref: market-data
+          path: market-data
+          fetch-depth: 0
+
+      - name: Check out immutable paper-state branch
+        uses: actions/checkout@v4
+        with:
+          ref: state
+          path: state
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install MEXC paper engine and test dependencies
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e engine
+          python -m pip install pytest
+
+      - name: Validate Volume Pricing ranking logic
+        working-directory: strategy
+        run: python -m pytest -q tests/test_volume_pricing.py
+
+      - name: Run daily-close decision or five-minute snapshot-only cycle
+        id: cycle
+        working-directory: strategy
+        shell: bash
+        timeout-minutes: 15
+        run: |
+          mkdir -p ../market-data/data/reports/mexc
+          set -o pipefail
+          python scripts/volume_pricing_paper_cycle.py | tee ../market-data/data/reports/mexc/volume-pricing-workflow-last-run.log
+
+      - name: Commit public MEXC data, market-cap snapshots and diagnostics
+        if: always()
+        working-directory: market-data
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f data/
+          if git diff --cached --quiet; then
+            echo "No public market-data changes."
+          else
+            git commit -m "Append Volume Pricing MEXC data and market-cap observations"
+            git push origin HEAD:market-data
+          fi
+
+      - name: Refresh immutable state branch after paper cycle
+        if: always()
+        working-directory: state
+        shell: bash
+        run: |
+          git fetch origin state
+          git reset --hard FETCH_HEAD
+
+      - name: Build primary status and inverse-volatility alternative equity curve
+        id: report
+        if: always()
+        working-directory: strategy
+        env:
+          PAPER_WORKFLOW_OUTCOME: ${{ steps.cycle.outcome }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+        run: python scripts/build_volume_pricing_status.py
+
+      - name: Publish status, journal and equity curves to main
+        if: always() && steps.report.outcome == 'success'
+        shell: bash
+        run: |
+          git -C strategy config user.name "github-actions[bot]"
+          git -C strategy config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for attempt in 1 2 3; do
+            git -C strategy fetch origin main
+            git -C strategy checkout -B main origin/main
+            git -C strategy add PAPER_STATUS.md PAPER_TRADE_JOURNAL.md equal_exposure_equity_curve.svg alternative_path_equity_curve.svg
+            if git -C strategy diff --cached --quiet; then
+              echo "Volume Pricing status unchanged."
+              exit 0
+            fi
+            git -C strategy commit -m "Refresh Volume Pricing paper status [skip ci]"
+            if git -C strategy push origin HEAD:main; then
+              exit 0
+            fi
+            echo "Concurrent main update; retrying fast-forward publication."
+          done
+          echo "Unable to publish Volume Pricing status after three retries."
+          exit 1
+
+      - name: Fail when the paper cycle itself is blocked or failed
+        if: always()
+        env:
+          CYCLE_OUTCOME: ${{ steps.cycle.outcome }}
+        run: |
+          if [ "$CYCLE_OUTCOME" != "success" ]; then
+            echo "::error::Volume Pricing paper cycle did not complete successfully ($CYCLE_OUTCOME)."
+            exit 1
+          fi
+
+      - name: Upload Volume Pricing diagnostics and equity curves
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: volume-pricing-mexc-100usdt-paper-status
+          path: |
+            market-data/data/reports/mexc/
+            market-data/data/market_cap/
+            strategy/PAPER_STATUS.md
+            strategy/PAPER_TRADE_JOURNAL.md
+            strategy/equal_exposure_equity_curve.svg
+            strategy/alternative_path_equity_curve.svg
+          if-no-files-found: warn
+          retention-days: 30
