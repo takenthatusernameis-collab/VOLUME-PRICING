@@ -23,7 +23,7 @@ def ticker(turnover: str, change: str, stamp: int = 1_800_000_000_000) -> dict:
     }
 
 
-def caps(**values: tuple[str, str]) -> dict[str, dict]:
+def caps(**values: str) -> dict[str, dict]:
     return {
         symbol: {
             "market_cap_usd": market_cap,
@@ -36,7 +36,8 @@ def caps(**values: tuple[str, str]) -> dict[str, dict]:
     }
 
 
-def test_ranking_uses_turnover_to_market_cap_then_direction(monkeypatch):
+def test_ranking_uses_turnover_to_market_cap_then_direction(monkeypatch, tmp_path):
+    monkeypatch.setattr(strategy, "_cache_path", lambda: tmp_path / "provider_cache.json")
     rows = [
         instrument(1, "AAA_USDT", "AAA"),
         instrument(2, "BBB_USDT", "BBB"),
@@ -49,8 +50,7 @@ def test_ranking_uses_turnover_to_market_cap_then_direction(monkeypatch):
         3: ticker("30", "0.03"),
         4: ticker("40", "0"),
     }
-    market_caps = caps(AAA=("100", "unused"), BBB=("100", "unused"),
-                       CCC=("100", "unused"), DDD=("100", "unused"))
+    market_caps = caps(AAA="100", BBB="100", CCC="100", DDD="100")
     monkeypatch.setattr(
         strategy,
         "_load_market_cap_cache",
@@ -68,10 +68,11 @@ def test_ranking_uses_turnover_to_market_cap_then_direction(monkeypatch):
     assert result.instruments_by_key["mexc:3"]["volume_to_market_cap_ratio"] == "0.3"
 
 
-def test_unmatched_market_cap_is_excluded_without_symbol_guessing(monkeypatch):
+def test_unmatched_market_cap_is_excluded_without_symbol_guessing(monkeypatch, tmp_path):
+    monkeypatch.setattr(strategy, "_cache_path", lambda: tmp_path / "provider_cache.json")
     rows = [instrument(1, "AAA_USDT", "AAA"), instrument(2, "BBB_USDT", "BBB")]
     tickers = {1: ticker("10", "0.02"), 2: ticker("20", "-0.01")}
-    market_caps = caps(AAA=("100", "unused"))
+    market_caps = caps(AAA="100")
     monkeypatch.setattr(
         strategy,
         "_load_market_cap_cache",
@@ -88,7 +89,8 @@ def test_unmatched_market_cap_is_excluded_without_symbol_guessing(monkeypatch):
     assert any("BBB_USDT:MISSING_OR_AMBIGUOUS_MARKET_CAP:BBB" == item for item in result.excluded)
 
 
-def test_non_usdt_contracts_never_enter_the_strategy_universe(monkeypatch):
+def test_non_usdt_contracts_never_enter_the_strategy_universe(monkeypatch, tmp_path):
+    monkeypatch.setattr(strategy, "_cache_path", lambda: tmp_path / "provider_cache.json")
     rows = [instrument(1, "AAA_USDT", "AAA")]
     other = dict(instrument(2, "BBB_USDC", "BBB"))
     other["quote_asset"] = "USDC"
@@ -97,7 +99,7 @@ def test_non_usdt_contracts_never_enter_the_strategy_universe(monkeypatch):
     monkeypatch.setattr(
         strategy,
         "_load_market_cap_cache",
-        lambda required, now: (caps(AAA=("100", "unused")), {"coverage": {"resolved_symbols": 1, "required_symbols": 1}}),
+        lambda required, now: (caps(AAA="100"), {"coverage": {"resolved_symbols": 1, "required_symbols": 1}}),
     )
 
     result = strategy.rank_volume_pricing_universe(
