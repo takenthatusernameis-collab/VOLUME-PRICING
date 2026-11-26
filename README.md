@@ -27,7 +27,7 @@ Both start at 100 USDT. The primary path uses the proven MEXC paper engine's boo
 - Portfolio decisions: once per newly completed UTC daily candle.
 - Intervening runs: mark-to-market snapshots, funding and risk checks only.
 - Persistent MEXC market data: `market-data` branch.
-- Immutable paper account events: `state` branch.
+- Immutable paper account events: `state-coinpaprika-v2` branch.
 - Main branch: code, `PAPER_STATUS.md`, journal and equity curves.
 - Public MEXC endpoints only. No API keys, exchange credentials, private endpoints, wallet access, testnet or live orders.
 
