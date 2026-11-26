@@ -1,10 +1,10 @@
 [mexc-history] resolved batch size=100 for 1087 active cross-margin perpetuals (0 configuration means full universe)
 [mexc-history] selected 100 stale instruments from 1087 active contracts for daily bar 1795564800000
-[mexc-history] checkpoint 25/100; new histories bootstrapped=25; bootstrap histories remaining=512; API failures=0
-[mexc-history] checkpoint 50/100; new histories bootstrapped=50; bootstrap histories remaining=487; API failures=0
-[mexc-history] checkpoint 75/100; new histories bootstrapped=75; bootstrap histories remaining=462; API failures=0
-[mexc-history] checkpoint 100/100; new histories bootstrapped=100; bootstrap histories remaining=437; API failures=0
-[mexc-history] batch finished: checked=100/100; new histories bootstrapped=100; bootstrap histories remaining=437; API failures=0
+[mexc-history] checkpoint 25/100; new histories bootstrapped=25; bootstrap histories remaining=412; API failures=0
+[mexc-history] checkpoint 50/100; new histories bootstrapped=50; bootstrap histories remaining=387; API failures=0
+[mexc-history] checkpoint 75/100; new histories bootstrapped=75; bootstrap histories remaining=362; API failures=0
+[mexc-history] checkpoint 100/100; new histories bootstrapped=100; bootstrap histories remaining=337; API failures=0
+[mexc-history] batch finished: checked=100/100; new histories bootstrapped=100; bootstrap histories remaining=337; API failures=0
 {
   "account_id": "mexc-usdt-forward-volume-pricing-coinpaprika-100usdt-v2",
   "active_cross_margin_perpetual_count": 1087,
@@ -22,8 +22,8 @@
     "unclassified": 200
   },
   "bootstrap_completed_this_run": 100,
-  "bootstrap_remaining": 437,
-  "candle_rows_stored": 283232,
+  "bootstrap_remaining": 337,
+  "candle_rows_stored": 287619,
   "credentials_used": false,
   "daily_decision_due": true,
   "daily_refresh_complete": false,
@@ -51,11 +51,11 @@
     "contracts_with_minimum_notional_above_1_usdt": 278,
     "evaluated_contracts": 1087,
     "minimum_order_notional_usdt": {
-      "maximum": "99.3700",
+      "maximum": "99.3200",
       "median": "0.27205",
-      "p10": "0.03017",
-      "p75": "1.05700",
-      "p90": "2.7104"
+      "p10": "0.03018",
+      "p75": "1.05300",
+      "p90": "2.7102"
     },
     "scope_note": "Minimum quantity and lot-step affordability only; turnover, book depth, fees and shortfall remain separate execution gates.",
     "status": "MEASURED_FROM_CURRENT_PUBLIC_TICKERS"
@@ -192,6 +192,25 @@
         "short_notional_usdt": "0",
         "timestamp_ms": 1795719520982,
         "utc_date": "2026-11-26"
+      },
+      {
+        "daily_drawdown_pct": "0",
+        "daily_peak_nav": "100",
+        "daily_return_pct": "0",
+        "daily_starting_nav": "100",
+        "daily_starting_reference": "first_observation_of_utc_day",
+        "drawdown_window_reference": "first_observation_of_utc_day",
+        "drawdown_window_starting_nav": "100",
+        "emergency_stop_flattened": false,
+        "emergency_stop_newly_triggered": false,
+        "emergency_stop_triggered": false,
+        "gross_exposure": "0",
+        "long_notional_usdt": "0",
+        "nav": "100",
+        "roi_pct": "0",
+        "short_notional_usdt": "0",
+        "timestamp_ms": 1795719751871,
+        "utc_date": "2026-11-26"
       }
     ],
     "fees_paid": "0",
@@ -223,13 +242,13 @@
   "research_long_top": [],
   "research_refresh_performed": true,
   "research_short_top": [],
-  "run_utc": "2026-11-26T18:58:50.325463+00:00",
-  "snapshot_partition": "../market-data/data/snapshots/2026-11-26/18.jsonl.gz",
+  "run_utc": "2026-11-26T19:02:41.080687+00:00",
+  "snapshot_partition": "../market-data/data/snapshots/2026-11-26/19.jsonl.gz",
   "state_event": {
-    "batch_hash": "16943e7f98c2d0c5d920bb6fbcfc3fcfe0e549e75d5e4bf8af52e9995374157c",
-    "commit_sha": "5cbd466d7a3c71319a74a45522f11d9568201cf8",
+    "batch_hash": "46724848e058c95b135a242c787ee6177c9f8d959a9811bacc2be0acbc1324e5",
+    "commit_sha": "6a1b9fe3b78197410c273412e9aada490d96ea8b",
     "created": true,
-    "path": "events/2026/11/risk-1795719520982.json"
+    "path": "events/2026/11/risk-1795719751871.json"
   },
   "state_recovery_probe_verified_from_prior_checkout": true,
   "state_write_mode": "UNPROTECTED_SINGLE_WRITER_APPEND_ONLY",
