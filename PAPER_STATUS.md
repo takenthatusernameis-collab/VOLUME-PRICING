@@ -8,10 +8,10 @@
 - Strategy generation: `volume-to-market-cap-first-positive-negative-coinpaprika-v2`
 - Starting capital: **100.00000000 USDT**
 - Account state: **INITIALIZED — FORWARD PAPER**
-- Last report build: 2026-11-26 19:05:54 UTC
-- Latest workflow run: [45880332977](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45880332977) · run #10, attempt 1 · success · push
+- Last report build: 2026-11-26 19:09:14 UTC
+- Latest workflow run: [45880781504](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45880781504) · run #11, attempt 1 · success · push
 - Latest processed daily candle: —
-- Latest account event: 2026-11-26 19:05:39 UTC
+- Latest account event: 2026-11-26 19:08:59 UTC
 - Primary execution journal: [PAPER_TRADE_JOURNAL.md](PAPER_TRADE_JOURNAL.md)
 
 
@@ -24,7 +24,7 @@
 - Excluded non-crypto categories: {'commodity': 13, 'equity': 139, 'fx': 6}
 - MEXC tickers received: 1087
 - Missing tickers: 0
-- History bootstrap remaining: 237
+- History bootstrap remaining: 137
 - API failures: 0
 - Latest completed daily candle (UTC ms): 1795564800000
 - Portfolio decision: `BLOCKED_INCOMPLETE_MARKET_DATA`
@@ -68,7 +68,7 @@ Portfolio transitions remain blocked until the complete eligible MEXC USDT unive
 
 | Session start (UTC) | Starting NAV | Latest NAV | Max drawdown | Marks |
 |---|---:|---:|---:|---:|
-| 2026-11-26 00:00:00 UTC | 100.00000000 | 100.00000000 | +0.000% | 7 |
+| 2026-11-26 00:00:00 UTC | 100.00000000 | 100.00000000 | +0.000% | 8 |
 
 ## Open positions
 
