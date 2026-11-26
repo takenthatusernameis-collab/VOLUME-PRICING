@@ -1,12 +1,12 @@
 # MEXC High-Low ATH/ATL Paper Research
 
-- Run (UTC): 2026-11-26T20:09:08.235000+00:00
+- Run (UTC): 2026-11-26T20:10:30.980000+00:00
 - Active cross-margin USDT perpetuals: not refreshed in snapshot mode
 - Bootstrap remaining: not refreshed in snapshot mode
 - History coverage gate: not checked in snapshot mode
 - State write mode: UNPROTECTED_SINGLE_WRITER_APPEND_ONLY
 - Paper simulation enabled: True
-- Decision: RETRY_PAIR_REBUILT
+- Decision: MONITORING_ONLY_NO_STRATEGY_DECISIONS
 
 ## Research long ranking — closest to ATH
 
@@ -20,7 +20,7 @@
 
 ## Data completeness
 
-- Ticker coverage: 0
+- Ticker coverage: 2
 - Missing latest daily bars: 0
 - All-time history verified: not refreshed
 - All-time history unverified: not refreshed
@@ -31,6 +31,23 @@
 
 ## Portfolio accounting
 
-Not initialized. Ranking and market-data collection do not imply a paper account. The fresh-checkout recovery probe must be verified and the explicit paper-state writer enabled.
+- Currency: USDT
+- Cash: 99.980101800
+- NAV: 99.517521800
+- Realized gross P&L: 0
+- Unrealized P&L: -0.462580000
+- Fees paid: 0.019898200
+- Confirmed funding: 0
+- Gross exposure: 2.008550216932753243057545671
+- Net exposure: 0.0005018211777857997263754210568
+- Open positions: 2
+- Closed trades: 0
+- Performance report status: INSUFFICIENT_DAILY_EQUITY_HISTORY
+
+## Daily equity curve
+
+| UTC daily bar | NAV (USDT) |
+|---|---:|
+No persisted daily equity observations yet.
 
 No exchange orders were submitted. All execution records are simulated.
