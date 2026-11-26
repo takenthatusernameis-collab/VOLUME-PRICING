@@ -610,7 +610,7 @@ def main() -> int:
                 decision_path.relative_to(market_data)
             )
         report_path.write_text(
-            json.dumps(report, indent=2, sort_keys=True, default=str) + "\\n",
+            json.dumps(report, indent=2, sort_keys=True, default=str) + "\n",
             encoding="utf-8",
         )
 
