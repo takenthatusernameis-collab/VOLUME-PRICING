@@ -23,6 +23,7 @@ At the first eligible run after a newly completed UTC daily candle:
 4. Sort all matched assets descending by this ratio. Tie-break deterministically by MEXC symbol and instrument ID.
 5. Filter this single ranking by the sign of MEXC's rolling 24-hour price change. The first positive-change asset is the long; the first negative-change asset is the short.
 6. Only those first two candidates are executable. If either cannot be executed under the paper engine's book/lot/shortfall checks, do not silently fall through to a lower-ranked symbol.
+   - Volume Pricing sets the paper engine's maximum modeled order-book shortfall to 25 bps (0.25%) per leg. The shared engine default remains 10 bps for other strategies; any fill above 25 bps is rejected.
 7. Require at least 80% fresh, unambiguous market-cap coverage across distinct eligible base-asset symbols; otherwise fail closed.
 8. Persist the derived ranking ratios, MEXC turnover, exclusions, provider attribution and source timestamps. Keep absolute market caps and the provider cache in the private Actions cache, not the public repository.
 
