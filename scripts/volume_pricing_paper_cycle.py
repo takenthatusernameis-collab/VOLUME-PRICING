@@ -182,6 +182,10 @@ def _fetch_coinpaprika_single_ticker(coin_id: str) -> dict[str, Any] | None:
     )
 
 
+def _normalize_provider_name(value: object) -> str:
+    return re.sub(r"[^A-Z0-9]", "", str(value or "").upper())
+
+
 def _group_provider_rows(rows: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for row in rows:
@@ -268,6 +272,11 @@ def _load_market_cap_records(
         catalogue = _fetch_coinpaprika_coin_catalogue()
         top_groups = _group_provider_rows(top_rows)
         catalogue_groups = _group_provider_rows(catalogue)
+        catalogue_name_groups: dict[str, list[dict[str, Any]]] = defaultdict(list)
+        for coin in catalogue:
+            normalized_name = _normalize_provider_name(coin.get("name"))
+            if normalized_name:
+                catalogue_name_groups[normalized_name].append(coin)
 
         resolved: dict[str, dict[str, Any]] = {}
         ambiguous: list[str] = []
@@ -312,10 +321,23 @@ def _load_market_cap_records(
                 if len(alias_matches) > 1:
                     ambiguous.append(base_symbol)
                     continue
-                if not alias_matches:
-                    missing.append(base_symbol)
-                    continue
-                coin_matches = alias_matches
+                if alias_matches:
+                    coin_matches = alias_matches
+                else:
+                    # Some MEXC contracts use a project name as base_asset
+                    # while the provider uses the canonical ticker (e.g. FILECOIN/FIL).
+                    name_matches = catalogue_name_groups.get(
+                        _normalize_provider_name(base_symbol), []
+                    )
+                    if len(name_matches) > 1:
+                        ambiguous.append(base_symbol)
+                        continue
+                    if not name_matches:
+                        missing.append(base_symbol)
+                        continue
+                    coin_matches = name_matches
+                    source_symbol = str(coin_matches[0].get("symbol", "")).upper()
+                    match_type = "exact_normalized_name_alias"
 
             coin_id = str(coin_matches[0].get("id", ""))
             if not coin_id:
