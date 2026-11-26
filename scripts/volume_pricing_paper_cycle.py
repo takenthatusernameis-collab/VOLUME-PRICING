@@ -12,7 +12,7 @@ from collections import defaultdict
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
@@ -42,6 +42,28 @@ USER_AGENT = "volume-pricing-forward-paper/1.0"
 
 class MarketCapDataError(RuntimeError):
     """Raised when no trustworthy unauthenticated market-cap source is available."""
+
+
+def _verify_remote_with_consistency_retries(
+    verify: Callable[[], Any],
+    *,
+    sleep: Callable[[float], None] = time.sleep,
+) -> Any:
+    """Retry only missing read-after-write event visibility; never bypass integrity checks."""
+    delays = (1, 2, 4, 8, 12, 15)
+    for attempt in range(len(delays) + 1):
+        try:
+            return verify()
+        except Exception as exc:
+            message = str(exc)
+            eventually_consistent = (
+                "Published event batch is not in the verified remote chain" in message
+                or "Required event batch is missing from remote chain" in message
+            )
+            if not eventually_consistent or attempt == len(delays):
+                raise
+            sleep(delays[attempt])
+    raise RuntimeError("Unreachable state verification retry exit")
 
 
 def _dec(value: object, field: str, *, positive: bool = False) -> Decimal:
@@ -775,17 +797,28 @@ def main() -> int:
     # Keep the CoinPaprika-only v2 paper account isolated from the initial
     # provider experiment and its immutable event chain.
     original_state_publisher = engine.GitHubStatePublisher
+    from high_vs_low.github_state import GitHubStateError
 
-    def volume_pricing_state_publisher(repository_full_name, token, **kwargs):
-        kwargs.pop("branch", None)
-        return original_state_publisher(
-            repository_full_name,
-            token,
-            branch="state-coinpaprika-v2",
-            **kwargs,
-        )
+    class VolumePricingStatePublisher(original_state_publisher):
+        def __init__(self, repository_full_name, token, **kwargs):
+            kwargs.pop("branch", None)
+            super().__init__(
+                repository_full_name,
+                token,
+                branch="state-coinpaprika-v2",
+                **kwargs,
+            )
 
-    engine.GitHubStatePublisher = volume_pricing_state_publisher
+        def _verify_remote_batch(
+            self, repo_path, branch_path, encoded_path, content, batch_hash
+        ):
+            return _verify_remote_with_consistency_retries(
+                lambda: super(VolumePricingStatePublisher, self)._verify_remote_batch(
+                    repo_path, branch_path, encoded_path, content, batch_hash
+                )
+            )
+
+    engine.GitHubStatePublisher = VolumePricingStatePublisher
 
     global _BOOTSTRAP_STATUS, _STRATEGY_UNIVERSE_SUMMARY, _MARKET_CAP_SOURCE_SUMMARY
     _BOOTSTRAP_STATUS = {}
