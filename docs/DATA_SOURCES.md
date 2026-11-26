@@ -5,11 +5,11 @@ Last checked: 2026-11-26. The strategy needs circulating market capitalization i
 ## Selected source: CoinPaprika Free API
 
 - No API key, account, registration or payment card.
-- Free tier: 20,000 calls/month per IP; the bulk ticker catalogue returns up to 2,000 assets.
-- The free coin catalogue endpoint returns the broader active-coin list (about 12,000 entries in the current catalogue). The single-coin ticker endpoint, GET /v1/tickers/{coin_id}, supplies the USD market-cap quote for a selected coin ID.
+- Free tier: 20,000 calls/month per IP and a stated 2,000-asset data limit. The bulk ticker catalogue returns up to 2,000 assets.
+- The public coin catalogue lists more than 11,000 active assets, and the API documents a single-coin ticker endpoint, GET /v1/tickers/{coin_id}. The workflow uses that endpoint for MEXC symbols outside the bulk list, but the free plan's 2,000-asset entitlement may restrict out-of-list access. The first individual lookup is therefore fail-fast: if the endpoint returns 402/403, the cycle stops immediately without consuming the remaining lookup budget. Actual out-of-list free-tier coverage remains to be verified by the first full-universe run.
 - The workflow first matches the 2,000-asset ticker list, then uses the full coin catalogue to find unique IDs for MEXC assets outside that list and requests their individual tickers.
 - Rate limit: 10 requests/second. Individual lookups are paced at no more than approximately 8 requests/second.
-- Monthly quota guard: at most 640 individual ticker lookups plus two catalogue calls per daily decision. This is at most 642 calls/day, or 19,902 calls in a 31-day month. If more lookups are needed, the strategy fails closed rather than exceeding the free-tier budget.
+- Monthly quota guard: at most 640 individual ticker lookups plus two catalogue calls per daily decision. This is at most 642 calls/day, or 19,902 calls in a 31-day month. If more lookups are needed, the strategy fails closed rather than exceeding the free-tier budget. This quota guard does not override the separate 2,000-asset entitlement.
 - Free licence is for personal use, side projects, learning and prototypes, not commercial products. Bulk redistribution of raw API data requires written permission, and a "Powered by CoinPaprika" attribution is required.
 - This is a personal paper-research workflow. The raw coin catalogue and absolute provider market-cap values are kept in memory and in a private GitHub Actions cache only. They are not committed to the public repository. Public artifacts contain derived volume/market-cap ratios, MEXC turnover, provider attribution and source timestamps, not a bulk copy of CoinPaprika data.
 - Provider lookups are deferred until all eligible MEXC histories and current tickers pass the bootstrap gate. They run for the daily decision, never on five-minute mark snapshots. The private cache and daily attempt latch prevent repeated calls on retry runs.
