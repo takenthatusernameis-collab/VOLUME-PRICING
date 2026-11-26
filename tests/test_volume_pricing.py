@@ -1,5 +1,6 @@
 from decimal import Decimal
 import json
+from types import SimpleNamespace
 
 import scripts.volume_pricing_paper_cycle as strategy
 
@@ -345,3 +346,30 @@ def test_coingecko_fallback_survives_coinpaprika_plan_limit_but_reports_missing(
     assert report["coinpaprika_single_lookup_plan_limited"] is True
     assert report["coverage"]["missing_symbols"] == ["CCC"]
     assert report["coverage"]["resolved_symbols"] == 2
+
+
+def test_ranking_report_serializes_close_price_without_binary_float():
+    candidate = SimpleNamespace(
+        symbol="mexc:1",
+        direction="long",
+        close_price=1.2345,
+        decision_timestamp_ms=1_800_000_000_000,
+    )
+    instrument_row = {
+        "symbol": "AAA_USDT",
+        "instrument_id": 1,
+        "base_asset": "AAA",
+        "volume_to_market_cap_ratio": "0.25",
+        "volume_to_market_cap_pct": "25",
+        "mexc_turnover_24h_usdt": "25",
+        "market_cap_provider": "coingecko",
+        "market_cap_source_symbol": "AAA",
+        "market_cap_symbol_match_type": "exact_coingecko_top_2000",
+        "market_cap_source_updated_ms": 1_800_000_000_000,
+        "mexc_change_24h": "0.02",
+    }
+
+    row = strategy._ranking_report_rows([candidate], {"mexc:1": instrument_row})[0]
+
+    assert row["completed_daily_close"] == "1.2345"
+    assert isinstance(row["completed_daily_close"], str)
