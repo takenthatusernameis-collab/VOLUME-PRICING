@@ -8,8 +8,8 @@
 - Strategy generation: `volume-to-market-cap-first-positive-negative-coinpaprika-v2`
 - Starting capital: **100.00000000 USDT**
 - Account state: **INITIALIZED — FORWARD PAPER**
-- Last report build: 2026-11-26 19:14:13 UTC
-- Latest workflow run: [45881561884](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45881561884) · run #13, attempt 1 · failure · push
+- Last report build: 2026-11-26 19:20:45 UTC
+- Latest workflow run: [45882899910](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45882899910) · run #14, attempt 1 · skipped · push
 - Latest processed daily candle: —
 - Latest account event: 2026-11-26 19:12:20 UTC
 - Primary execution journal: [PAPER_TRADE_JOURNAL.md](PAPER_TRADE_JOURNAL.md)
@@ -30,7 +30,7 @@
 - Portfolio decision: `FAILED`
 - Market-cap provider: coinpaprika — Powered by CoinPaprika
 - Fresh market-cap matches: 460/611
-- CoinPaprika calls this daily decision: 37/642
+- Market-cap API calls: CoinPaprika —/642; CoinGecko —/8
 
 ### Volume-to-market-cap ranking
 
