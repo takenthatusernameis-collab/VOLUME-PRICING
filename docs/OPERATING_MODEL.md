@@ -18,13 +18,13 @@ Discover active MEXC cross-margin perpetuals, then restrict the strategy univers
 At the first eligible run after a newly completed UTC daily candle:
 
 1. Get the complete eligible MEXC USDT perpetual universe and fresh MEXC tickers.
-2. Resolve each base asset to an exact, unambiguous provider market-cap record.
+2. Resolve each base asset to an exact, unambiguous CoinPaprika record; only strip a documented MEXC 1,000×/10,000×/1,000,000× denomination prefix when the underlying symbol is unique.
 3. Calculate MEXC rolling 24-hour USDT quote turnover divided by circulating market cap in USD.
 4. Sort all matched assets descending by this ratio. Tie-break deterministically by MEXC symbol and instrument ID.
 5. Filter this single ranking by the sign of MEXC's rolling 24-hour price change. The first positive-change asset is the long; the first negative-change asset is the short.
 6. Only those first two candidates are executable. If either cannot be executed under the paper engine's book/lot/shortfall checks, do not silently fall through to a lower-ranked symbol.
 7. Require at least 80% fresh, unambiguous market-cap coverage across distinct eligible base-asset symbols; otherwise fail closed.
-8. Persist the ranking, market-cap observations, exclusions, provider metadata and decision timestamp.
+8. Persist the derived ranking ratios, MEXC turnover, exclusions, provider attribution and source timestamps. Keep absolute market caps and the provider cache in the private Actions cache, not the public repository.
 
 The ranking order is not the long/short signal by itself: the price-change sign determines direction.
 
@@ -37,7 +37,7 @@ The ranking order is not the long/short signal by itself: the price-change sign 
 
 ## Data history and coverage
 
-The reused engine bootstraps MEXC daily candles in bounded batches and persists them on `market-data`. It requires the latest completed daily bar and current ticker coverage before a portfolio transition. The inverse-volatility path uses 30 common completed daily returns; it does not claim that the market-cap data source provides historical market caps.
+The reused engine bootstraps a 45-day rolling MEXC daily-candle window in bounded batches and persists it on `market-data`. This is sufficient for ATR14 and the 30-day inverse-volatility path; no all-time history is required. It requires the latest completed daily bar and current ticker coverage before a portfolio transition. CoinPaprika lookups are deferred until full MEXC history/ticker coverage passes and run once per daily decision, not on five-minute snapshots. The free-tier quota guard allows at most 640 individual ticker lookups plus two catalogue calls per day. The inverse-volatility path uses 30 common completed daily returns; it does not claim that the market-cap data source provides historical market caps.
 
 ## Portfolio paths
 
@@ -52,8 +52,8 @@ A visual-only shadow path replays the primary account's selected symbols, sides 
 ## Persistence and reporting
 
 - `main`: source code, `PAPER_STATUS.md`, trade journal and SVG curves.
-- `market-data`: MEXC daily history, ticker snapshots, provider cache, decision-stamped market-cap/ranking snapshots and cycle diagnostics.
-- `state`: immutable, hash-chained paper events.
+- `market-data`: MEXC daily history, ticker snapshots, a non-sensitive daily provider-attempt latch, derived ranking snapshots and cycle diagnostics. Absolute market caps and the provider cache are excluded from this public branch.
+- `state-coinpaprika-v2`: isolated immutable, hash-chained events for the CoinPaprika-only v2 paper account. The initial provider experiment remains isolated on the old `state` branch.
 - One non-cancelling GitHub Actions concurrency group serializes all state writers.
 - The publisher verifies remote read-back; the next invocation restores the fresh state branch before financial account initialization.
 - Every report separates market-data coverage, market-cap matching, signal selection, execution, account initialization and performance evidence.
