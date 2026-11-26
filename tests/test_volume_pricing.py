@@ -51,6 +51,8 @@ def test_ranking_uses_turnover_to_market_cap_then_direction(monkeypatch, tmp_pat
         4: ticker("40", "0"),
     }
     market_caps = caps(AAA="100", BBB="100", CCC="100", DDD="100")
+    stamp = 1_799_913_600_000
+    histories = {iid: [{"timestamp_ms": stamp, "close": "1"}] for iid in (1, 2, 3, 4)}
     monkeypatch.setattr(
         strategy,
         "_load_market_cap_cache",
@@ -58,7 +60,7 @@ def test_ranking_uses_turnover_to_market_cap_then_direction(monkeypatch, tmp_pat
     )
 
     result = strategy.rank_volume_pricing_universe(
-        rows, {}, tickers, Decimal("100"), as_of_timestamp_ms=1_799_913_600_000
+        rows, histories, tickers, Decimal("100"), as_of_timestamp_ms=stamp
     )
 
     assert [row.symbol for row in result.research_longs] == ["mexc:3", "mexc:1"]
@@ -70,28 +72,41 @@ def test_ranking_uses_turnover_to_market_cap_then_direction(monkeypatch, tmp_pat
 
 def test_unmatched_market_cap_is_excluded_without_symbol_guessing(monkeypatch, tmp_path):
     monkeypatch.setattr(strategy, "_cache_path", lambda: tmp_path / "provider_cache.json")
-    rows = [instrument(1, "AAA_USDT", "AAA"), instrument(2, "BBB_USDT", "BBB")]
-    tickers = {1: ticker("10", "0.02"), 2: ticker("20", "-0.01")}
-    market_caps = caps(AAA="100")
+    rows = [
+        instrument(1, "AAA_USDT", "AAA"),
+        instrument(2, "BBB_USDT", "BBB"),
+        instrument(3, "CCC_USDT", "CCC"),
+        instrument(4, "DDD_USDT", "DDD"),
+        instrument(5, "EEE_USDT", "EEE"),
+    ]
+    tickers = {1: ticker("10", "0.02"), 2: ticker("20", "-0.01"),
+               3: ticker("30", "0.03"), 4: ticker("40", "-0.02"),
+               5: ticker("50", "0.01")}
+    market_caps = caps(AAA="100", CCC="100", DDD="100", EEE="100")
+    stamp = 1_799_913_600_000
+    histories = {iid: [{"timestamp_ms": stamp, "close": "1"}] for iid in (1, 2, 3, 4, 5)}
     monkeypatch.setattr(
         strategy,
         "_load_market_cap_cache",
-        lambda required, now: (market_caps, {"coverage": {"resolved_symbols": 1, "required_symbols": 2}}),
+        lambda required, now: (market_caps, {"coverage": {"resolved_symbols": 4, "required_symbols": 5}}),
     )
 
     result = strategy.rank_volume_pricing_universe(
-        rows, {}, tickers, Decimal("100"), as_of_timestamp_ms=1_799_913_600_000
+        rows, histories, tickers, Decimal("100"), as_of_timestamp_ms=stamp
     )
 
-    assert [row.symbol for row in result.research_longs] == ["mexc:1"]
-    assert result.research_shorts == []
-    assert result.executable_shorts == []
+    assert [row.symbol for row in result.research_longs] == ["mexc:5", "mexc:4", "mexc:3", "mexc:1"]
+    assert [row.symbol for row in result.research_shorts] == ["mexc:4"]
+    assert [row.symbol for row in result.executable_longs] == ["mexc:5"]
+    assert [row.symbol for row in result.executable_shorts] == ["mexc:4"]
     assert any("BBB_USDT:MISSING_OR_AMBIGUOUS_MARKET_CAP:BBB" == item for item in result.excluded)
 
 
 def test_non_usdt_contracts_never_enter_the_strategy_universe(monkeypatch, tmp_path):
     monkeypatch.setattr(strategy, "_cache_path", lambda: tmp_path / "provider_cache.json")
     rows = [instrument(1, "AAA_USDT", "AAA")]
+    stamp = 1_799_913_600_000
+    histories = {1: [{"timestamp_ms": stamp, "close": "1"}]}
     other = dict(instrument(2, "BBB_USDC", "BBB"))
     other["quote_asset"] = "USDC"
     other["settlement_asset"] = "USDC"
@@ -104,10 +119,10 @@ def test_non_usdt_contracts_never_enter_the_strategy_universe(monkeypatch, tmp_p
 
     result = strategy.rank_volume_pricing_universe(
         rows + [other],
-        {},
+        histories,
         {1: ticker("10", "0.02"), 2: ticker("1000", "-0.5")},
         Decimal("100"),
-        as_of_timestamp_ms=1_799_913_600_000,
+        as_of_timestamp_ms=stamp,
     )
 
     assert [row.symbol for row in result.research_longs] == ["mexc:1"]
