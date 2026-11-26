@@ -29,6 +29,7 @@ INITIAL_CAPITAL = Decimal("100")
 CACHE_TTL_MS = 6 * 60 * 60 * 1000
 MAX_SOURCE_AGE_MS = 24 * 60 * 60 * 1000
 MAX_TICKER_SPREAD_MS = 5 * 60 * 1000
+_PENDING_DECISION_SNAPSHOT: dict[str, Any] | None = None
 DAY_MS = 86_400_000
 USER_AGENT = "volume-pricing-forward-paper/1.0"
 
@@ -396,6 +397,10 @@ def rank_volume_pricing_universe(
         iid = int(instrument["instrument_id"])
         symbol = str(instrument.get("symbol", iid))
         base = str(instrument.get("base_asset", "")).strip().upper()
+        daily_rows = histories.get(iid, [])
+        if not any(int(row.get("timestamp_ms", 0)) == as_of_timestamp_ms for row in daily_rows):
+            excluded.append(f"{symbol}:MISSING_COMPLETED_DAILY_CANDLE")
+            continue
         ticker = tickers.get(iid)
         if ticker is None:
             excluded.append(f"{symbol}:MISSING_MEXC_TICKER")
@@ -464,8 +469,6 @@ def rank_volume_pricing_universe(
     executable_longs = longs[:1]
     executable_shorts = shorts[:1]
 
-    decision_dir = _cache_path().parent / "decisions"
-    decision_path = decision_dir / f"daily_bar_{as_of_timestamp_ms}.json"
     decision_snapshot = {
         "strategy_id": STRATEGY_ID,
         "decision_daily_bar_timestamp_ms": int(as_of_timestamp_ms),
@@ -498,8 +501,8 @@ def rank_volume_pricing_universe(
         ),
         "excluded": excluded,
     }
-    if not decision_path.exists():
-        _write_json_atomic(decision_path, decision_snapshot)
+    global _PENDING_DECISION_SNAPSHOT
+    _PENDING_DECISION_SNAPSHOT = decision_snapshot
 
     print(
         "[volume-pricing] "
@@ -572,7 +575,50 @@ def main() -> int:
         return original_instruments(self, usdt_only=True)
 
     engine.MEXCPublicClient.instruments = usdt_instruments
-    return int(engine._run())
+    result = int(engine._run())
+
+    # Publish the full ranking only after the shared engine confirms that the
+    # entire eligible universe has current daily data and fresh tickers. During
+    # bootstrap, provisional rankings never become the frozen daily snapshot.
+    market_data = Path(os.environ.get("MARKET_DATA_DIR", "../market-data"))
+    report_path = market_data / "data" / "reports" / "mexc" / "latest_cycle.json"
+    if _PENDING_DECISION_SNAPSHOT is not None and report_path.is_file():
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+        report["market_cap_source_summary"] = _PENDING_DECISION_SNAPSHOT["market_cap_sources"]
+        if (
+            report.get("history_coverage_pass") is True
+            and int(report.get("latest_completed_daily_bar_ms", 0))
+            == int(_PENDING_DECISION_SNAPSHOT["decision_daily_bar_timestamp_ms"])
+        ):
+            decision_dir = market_data / "data" / "market_cap" / "decisions"
+            decision_path = decision_dir / (
+                f"daily_bar_{_PENDING_DECISION_SNAPSHOT['decision_daily_bar_timestamp_ms']}.json"
+            )
+            if not decision_path.exists():
+                _write_json_atomic(decision_path, _PENDING_DECISION_SNAPSHOT)
+            report["market_cap_decision_snapshot_path"] = str(
+                decision_path.relative_to(market_data)
+            )
+        report_path.write_text(
+            json.dumps(report, indent=2, sort_keys=True, default=str) + "\\n",
+            encoding="utf-8",
+        )
+
+    # A clean bounded bootstrap batch is normal progress; portfolio changes
+    # remain blocked until the full-universe coverage gate passes.
+    if result != 0 and report_path.is_file():
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+        expected_bootstrap = (
+            report.get("paper_decision_status") == "BLOCKED_INCOMPLETE_MARKET_DATA"
+            and int(report.get("bootstrap_remaining", 0)) > 0
+            and int(report.get("api_failure_count", 0)) == 0
+            and int(report.get("missing_ticker_count", 0)) == 0
+            and int(report.get("missing_latest_bar_count", 0)) == 0
+        )
+        if expected_bootstrap:
+            print("[volume-pricing-bootstrap] History is still being collected; portfolio changes remain blocked.")
+            return 0
+    return result
 
 
 if __name__ == "__main__":
