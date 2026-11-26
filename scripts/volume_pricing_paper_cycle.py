@@ -880,6 +880,8 @@ def _ranking_report_rows(
             "instrument_id": int(instrument["instrument_id"]),
             "base_asset": str(instrument.get("base_asset", "")),
             "direction": candidate.direction,
+            "distance_pct": str(candidate.distance_pct),
+            "extreme_price": None if candidate.extreme_price is None else str(candidate.extreme_price),
             "volume_to_market_cap_ratio": str(instrument["volume_to_market_cap_ratio"]),
             "volume_to_market_cap_pct": str(instrument["volume_to_market_cap_pct"]),
             "mexc_turnover_24h_usdt": str(instrument["mexc_turnover_24h_usdt"]),
