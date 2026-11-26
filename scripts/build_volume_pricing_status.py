@@ -106,7 +106,7 @@ if coverage_path.is_file():
         coverage_note += "\n" + "\n".join(
             f"- {row.get('symbol', '—')}: ratio={row.get('volume_to_market_cap_pct', '—')}%, "
             f"MEXC 24h change={row.get('mexc_change_24h', '—')}, "
-            f"market-cap source={row.get('market_cap_provider', '—')}"
+            f"market-cap source={row.get('market_cap_provider', '—')} match={row.get('market_cap_symbol_match_type', 'exact')}"
             for row in long_preview
         )
     else:
@@ -117,7 +117,7 @@ if coverage_path.is_file():
         coverage_note += "\n" + "\n".join(
             f"- {row.get('symbol', '—')}: ratio={row.get('volume_to_market_cap_pct', '—')}%, "
             f"MEXC 24h change={row.get('mexc_change_24h', '—')}, "
-            f"market-cap source={row.get('market_cap_provider', '—')}"
+            f"market-cap source={row.get('market_cap_provider', '—')} match={row.get('market_cap_symbol_match_type', 'exact')}"
             for row in short_preview
         )
     else:
