@@ -16,3 +16,5 @@ Continue bootstrap after adding bounded state-ledger read-after-write verificati
 Bootstrap batch 7; run current source and workflow revisions with raw provider cache excluded from artifacts.
 
 Bootstrap batch 8; publish truthful BOOTSTRAPPING status until the full universe passes.
+
+Bootstrap batch 9; continue the serialized full-universe history preparation.
