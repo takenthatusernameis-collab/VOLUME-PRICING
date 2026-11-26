@@ -296,6 +296,7 @@ def test_coingecko_keyless_market_pages_fill_coinpaprika_gaps(monkeypatch, tmp_p
     assert report["attribution"] == "Powered by CoinPaprika; Powered by CoinGecko"
     assert report["coverage"]["resolved_symbols"] == 2
     assert report["coingecko_api_calls_used"] == 1
+    assert report["coingecko_request_interval_ms"] == 12500
     assert json.loads(cache_path.read_text())["cache_version"] == 2
     assert json.loads(attempt_path.read_text())["status"] == "COMPLETED"
 
