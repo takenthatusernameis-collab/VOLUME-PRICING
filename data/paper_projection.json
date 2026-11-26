@@ -1,5 +1,5 @@
 {
-  "last_run_utc": "2026-11-26T19:12:20.170000+00:00",
+  "last_run_utc": "2026-11-26T19:29:00.642000+00:00",
   "portfolio_state": {
     "account_id": "mexc-usdt-forward-volume-pricing-coinpaprika-100usdt-v2",
     "cash": "100",
@@ -193,13 +193,64 @@
         "short_notional_usdt": "0",
         "timestamp_ms": 1795720340170,
         "utc_date": "2026-11-26"
+      },
+      {
+        "daily_drawdown_pct": "0",
+        "daily_peak_nav": "100",
+        "daily_return_pct": "0",
+        "daily_starting_nav": "100",
+        "daily_starting_reference": "first_observation_of_utc_day",
+        "drawdown_window_reference": "first_observation_of_utc_day",
+        "drawdown_window_starting_nav": "100",
+        "emergency_stop_flattened": false,
+        "emergency_stop_newly_triggered": false,
+        "emergency_stop_triggered": false,
+        "gross_exposure": "0",
+        "long_notional_usdt": "0",
+        "nav": "100",
+        "roi_pct": "0",
+        "short_notional_usdt": "0",
+        "timestamp_ms": 1795721340642,
+        "utc_date": "2026-11-26"
       }
     ],
     "fees_paid": "0",
     "initial_capital": "100",
+    "last_decision_attempt_daily_bar_ms": 1795564800000,
     "last_processed_daily_bar_ms": null,
-    "last_snapshot_ms": 1795720340170,
+    "last_snapshot_ms": 1795721340642,
     "partial_realized_net_pnls": [],
+    "pending_entry_signal": {
+      "attempt_count": 0,
+      "daily_bar_timestamp_ms": 1795564800000,
+      "executable_longs": [
+        {
+          "candidate_key": "mexc:1845",
+          "cycle_age": null,
+          "decision_timestamp_ms": 1795564800000,
+          "direction": "long",
+          "distance_pct": "7.86891369058299",
+          "extreme_price": null,
+          "extreme_timestamp_ms": null,
+          "instrument_id": 1845,
+          "semi_cycle_direction": null
+        }
+      ],
+      "executable_shorts": [
+        {
+          "candidate_key": "mexc:1281",
+          "cycle_age": null,
+          "decision_timestamp_ms": 1795564800000,
+          "direction": "short",
+          "distance_pct": "1.284022953120329",
+          "extreme_price": null,
+          "extreme_timestamp_ms": null,
+          "instrument_id": 1281,
+          "semi_cycle_direction": null
+        }
+      ],
+      "last_attempt_ms": null
+    },
     "positions": [],
     "realized_gross_pnl": "0",
     "schema_version": 1,
@@ -209,9 +260,9 @@
   },
   "schema_version": 1,
   "state_event": {
-    "batch_hash": "f3a39686edfbae65c7793fbe04b17148550177de8feac2428f238854491af65c",
-    "commit_sha": "fd75a6e597c1e7065f6d50bcbc052b2ecff59a31",
+    "batch_hash": "7aec44c29ddb522b9e30a386956c625939fe420935ffa026ef28adf09da78bc3",
+    "commit_sha": "24a0540855e005aae5276eaafca2268a1b468b20",
     "created": true,
-    "path": "events/2026/11/risk-1795720340170.json"
+    "path": "events/2026/11/risk-1795721340642.json"
   }
 }

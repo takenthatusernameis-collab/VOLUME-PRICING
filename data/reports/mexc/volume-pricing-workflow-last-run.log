@@ -1,4 +1,4 @@
 [mexc-history] resolved batch size=100 for 1087 active cross-margin perpetuals (0 configuration means full universe)
 [mexc-history] selected 0 stale instruments from 1087 active contracts for daily bar 1795564800000
 [mexc-history] batch finished: checked=0/0; new histories bootstrapped=0; bootstrap histories remaining=0; API failures=0
-[volume-pricing] eligible=611 ranked=514 long_candidates=419 short_candidates=88 market_cap_coverage=514/611
+[volume-pricing] eligible=611 ranked=514 long_candidates=401 short_candidates=106 market_cap_coverage=514/611
