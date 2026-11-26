@@ -38,3 +38,5 @@ Fix the journal's binary-float rejection and reuse the successful private dual-p
 Fix the shared-engine report schema and rerun the first forward portfolio decision using cached market-cap coverage.
 
 Use the persisted daily decision watermark for snapshot-only retries and preserve provider coverage in status.
+
+Refresh snapshot-only retry diagnostics and status from the frozen daily ranking.
