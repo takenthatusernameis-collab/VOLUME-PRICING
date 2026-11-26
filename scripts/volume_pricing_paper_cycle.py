@@ -464,24 +464,25 @@ def _load_market_cap_records(
                 if alias_resolved and not coinpaprika_alias_found:
                     continue
 
-                normalized_base = _normalize_provider_name(base_symbol)
-                if resolve_coingecko(
-                    base_symbol,
-                    coingecko_name_groups.get(normalized_base, []),
-                    "exact_normalized_name_coingecko_alias",
-                    str((coingecko_name_groups.get(normalized_base) or [{}])[0].get("symbol", base_symbol)).upper(),
-                ):
-                    continue
-                name_matches = catalogue_name_groups.get(normalized_base, [])
-                if len(name_matches) > 1:
-                    ambiguous.append(base_symbol)
-                    continue
-                if not name_matches:
-                    missing.append(base_symbol)
-                    continue
-                coin_matches = name_matches
-                source_symbol = str(coin_matches[0].get("symbol", "")).upper()
-                match_type = "exact_normalized_name_coinpaprika_alias"
+                if not coin_matches:
+                    normalized_base = _normalize_provider_name(base_symbol)
+                    if resolve_coingecko(
+                        base_symbol,
+                        coingecko_name_groups.get(normalized_base, []),
+                        "exact_normalized_name_coingecko_alias",
+                        str((coingecko_name_groups.get(normalized_base) or [{}])[0].get("symbol", base_symbol)).upper(),
+                    ):
+                        continue
+                    name_matches = catalogue_name_groups.get(normalized_base, [])
+                    if len(name_matches) > 1:
+                        ambiguous.append(base_symbol)
+                        continue
+                    if not name_matches:
+                        missing.append(base_symbol)
+                        continue
+                    coin_matches = name_matches
+                    source_symbol = str(coin_matches[0].get("symbol", "")).upper()
+                    match_type = "exact_normalized_name_coinpaprika_alias"
 
             coin_id = str(coin_matches[0].get("id", ""))
             if not coin_id:
