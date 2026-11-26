@@ -34,6 +34,7 @@ COINPAPRIKA_REQUEST_INTERVAL_SECONDS = 0.13
 _LAST_COINPAPRIKA_REQUEST = 0.0
 _PENDING_DECISION_SNAPSHOT: dict[str, Any] | None = None
 _BOOTSTRAP_STATUS: dict[str, Any] | None = None
+_STRATEGY_UNIVERSE_SUMMARY: dict[str, Any] | None = None
 USER_AGENT = "volume-pricing-forward-paper/1.0"
 
 
@@ -525,18 +526,33 @@ def rank_volume_pricing_universe(
     **_: Any,
 ) -> MEXCRankings:
     """Rank MEXC USDT perps by 24h turnover / circulating USD market cap."""
-    global _PENDING_DECISION_SNAPSHOT
+    global _PENDING_DECISION_SNAPSHOT, _STRATEGY_UNIVERSE_SUMMARY
     if not nav.is_finite() or nav <= 0:
         raise ValueError("nav must be a finite positive Decimal")
     if as_of_timestamp_ms <= 0:
         raise ValueError("as_of_timestamp_ms must be positive")
 
-    eligible = [
+    all_usdt = [
         row for row in instruments
         if bool(row.get("usdt_account_eligible"))
         and str(row.get("quote_asset", "")).upper() == "USDT"
         and str(row.get("settlement_asset", "")).upper() == "USDT"
     ]
+    category_counts: dict[str, int] = defaultdict(int)
+    for row in all_usdt:
+        category_counts[str(row.get("category", "unknown")).lower()] += 1
+    eligible = [
+        row for row in all_usdt
+        if str(row.get("category", "unknown")).lower() in {"crypto", "unclassified"}
+    ]
+    _STRATEGY_UNIVERSE_SUMMARY = {
+        "all_usdt_perpetuals": len(all_usdt),
+        "eligible_crypto_and_unclassified": len(eligible),
+        "excluded_by_category": {
+            key: value for key, value in sorted(category_counts.items())
+            if key not in {"crypto", "unclassified"}
+        },
+    }
     symbols = {
         str(row.get("base_asset", "")).strip().upper()
         for row in eligible if str(row.get("base_asset", "")).strip()
@@ -806,8 +822,9 @@ def main() -> int:
 
     engine.GitHubStatePublisher = volume_pricing_state_publisher
 
-    global _BOOTSTRAP_STATUS
+    global _BOOTSTRAP_STATUS, _STRATEGY_UNIVERSE_SUMMARY
     _BOOTSTRAP_STATUS = {}
+    _STRATEGY_UNIVERSE_SUMMARY = None
     original_bootstrap = engine._bootstrap_or_increment
     original_daily_refresh_complete = engine._daily_refresh_complete
 
@@ -836,6 +853,8 @@ def main() -> int:
             "history_coverage_pass": False,
             "cycle_exception": f"{type(exc).__name__}: {str(exc)[:1000]}",
         }
+        if _STRATEGY_UNIVERSE_SUMMARY is not None:
+            failure_report["strategy_universe_summary"] = _STRATEGY_UNIVERSE_SUMMARY
         _write_json_atomic(report_path, failure_report)
         raise
 
@@ -859,6 +878,8 @@ def main() -> int:
             report["market_cap_decision_snapshot_path"] = str(
                 decision_path.relative_to(market_data)
             )
+        if _STRATEGY_UNIVERSE_SUMMARY is not None:
+            report["strategy_universe_summary"] = _STRATEGY_UNIVERSE_SUMMARY
         report_path.write_text(
             json.dumps(report, indent=2, sort_keys=True, default=str) + "\n",
             encoding="utf-8",
