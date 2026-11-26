@@ -609,6 +609,8 @@ def rank_volume_pricing_universe(
         enriched = dict(instrument)
         enriched.update({
             "market_cap_provider": str(cap_row.get("provider", "")),
+            "market_cap_source_symbol": str(cap_row.get("source_symbol", base)),
+            "market_cap_symbol_match_type": str(cap_row.get("symbol_match_type", "exact")),
             "market_cap_source_updated_ms": int(cap_row.get("source_updated_ms", 0)),
             "mexc_turnover_24h_usdt": str(turnover),
             "mexc_change_24h": str(change),
@@ -663,6 +665,8 @@ def rank_volume_pricing_universe(
                 "mexc_change_24h": str(item[3]),
                 "mexc_turnover_24h_usdt": item[2]["mexc_turnover_24h_usdt"],
                 "market_cap_provider": item[2]["market_cap_provider"],
+                "market_cap_source_symbol": item[2]["market_cap_source_symbol"],
+                "market_cap_symbol_match_type": item[2]["market_cap_symbol_match_type"],
                 "market_cap_source_updated_ms": item[2]["market_cap_source_updated_ms"],
                 "volume_to_market_cap_ratio": str(item[0]),
                 "volume_to_market_cap_pct": item[2]["volume_to_market_cap_pct"],
@@ -715,6 +719,8 @@ def _ranking_report_rows(
             "volume_to_market_cap_pct": str(instrument["volume_to_market_cap_pct"]),
             "mexc_turnover_24h_usdt": str(instrument["mexc_turnover_24h_usdt"]),
             "market_cap_provider": str(instrument["market_cap_provider"]),
+            "market_cap_source_symbol": str(instrument["market_cap_source_symbol"]),
+            "market_cap_symbol_match_type": str(instrument["market_cap_symbol_match_type"]),
             "market_cap_source_updated_ms": int(instrument["market_cap_source_updated_ms"]),
             "mexc_change_24h": str(instrument["mexc_change_24h"]),
             "completed_daily_close": candidate.close_price,
