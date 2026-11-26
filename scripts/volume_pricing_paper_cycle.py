@@ -35,6 +35,7 @@ _LAST_COINPAPRIKA_REQUEST = 0.0
 _PENDING_DECISION_SNAPSHOT: dict[str, Any] | None = None
 _BOOTSTRAP_STATUS: dict[str, Any] | None = None
 _STRATEGY_UNIVERSE_SUMMARY: dict[str, Any] | None = None
+_MARKET_CAP_SOURCE_SUMMARY: dict[str, Any] | None = None
 USER_AGENT = "volume-pricing-forward-paper/1.0"
 
 
@@ -553,7 +554,7 @@ def rank_volume_pricing_universe(
     **_: Any,
 ) -> MEXCRankings:
     """Rank MEXC USDT perps by 24h turnover / circulating USD market cap."""
-    global _PENDING_DECISION_SNAPSHOT, _STRATEGY_UNIVERSE_SUMMARY
+    global _PENDING_DECISION_SNAPSHOT, _STRATEGY_UNIVERSE_SUMMARY, _MARKET_CAP_SOURCE_SUMMARY
     if not nav.is_finite() or nav <= 0:
         raise ValueError("nav must be a finite positive Decimal")
     if as_of_timestamp_ms <= 0:
@@ -608,6 +609,7 @@ def rank_volume_pricing_universe(
             excluded=["BOOTSTRAP_INCOMPLETE: market-cap lookup deferred until full MEXC coverage"],
         )
     market_caps, source_report = _load_market_cap_records(symbols, now_ms)
+    _MARKET_CAP_SOURCE_SUMMARY = source_report
     coverage = source_report["coverage"]
     coverage_fraction = (
         Decimal(coverage["resolved_symbols"]) / Decimal(coverage["required_symbols"])
@@ -854,9 +856,10 @@ def main() -> int:
 
     engine.GitHubStatePublisher = volume_pricing_state_publisher
 
-    global _BOOTSTRAP_STATUS, _STRATEGY_UNIVERSE_SUMMARY
+    global _BOOTSTRAP_STATUS, _STRATEGY_UNIVERSE_SUMMARY, _MARKET_CAP_SOURCE_SUMMARY
     _BOOTSTRAP_STATUS = {}
     _STRATEGY_UNIVERSE_SUMMARY = None
+    _MARKET_CAP_SOURCE_SUMMARY = None
     original_bootstrap = engine._bootstrap_or_increment
     original_daily_refresh_complete = engine._daily_refresh_complete
 
@@ -887,6 +890,8 @@ def main() -> int:
         }
         if _STRATEGY_UNIVERSE_SUMMARY is not None:
             failure_report["strategy_universe_summary"] = _STRATEGY_UNIVERSE_SUMMARY
+        if _MARKET_CAP_SOURCE_SUMMARY is not None:
+            failure_report["market_cap_source_summary"] = _MARKET_CAP_SOURCE_SUMMARY
         _write_json_atomic(report_path, failure_report)
         raise
 
@@ -912,6 +917,8 @@ def main() -> int:
             )
         if _STRATEGY_UNIVERSE_SUMMARY is not None:
             report["strategy_universe_summary"] = _STRATEGY_UNIVERSE_SUMMARY
+        if _MARKET_CAP_SOURCE_SUMMARY is not None:
+            report["market_cap_source_summary"] = _MARKET_CAP_SOURCE_SUMMARY
         report_path.write_text(
             json.dumps(report, indent=2, sort_keys=True, default=str) + "\n",
             encoding="utf-8",
