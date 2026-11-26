@@ -60,7 +60,7 @@ markdown = (
         "The initial provider-validation attempt is isolated from this CoinPaprika-only v2 account. The current immutable paper ledger is on the state-coinpaprika-v2 branch."
     )
     .replace(
-        "This is the compact live status page. The former detailed v3 report is retained under archive/2026-11-18/ for audit purposes only.",
+        "This is the compact live status page. The former detailed v3 report is retained under `archive/2026-11-18/` for audit purposes only.",
         "This is the current live status page for the CoinPaprika-only v2 paper simulation."
     )
 )
