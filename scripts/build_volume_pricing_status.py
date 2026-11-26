@@ -16,8 +16,8 @@ sys.path.insert(0, str(ENGINE_ROOT / "src"))
 from high_vs_low.market_data_store import MarketDataStore
 import high_vs_low.paper_status as status
 
-status.ACCOUNT_ID = "mexc-usdt-forward-volume-pricing-100usdt-v1"
-status.STRATEGY_ID = "volume-to-market-cap-first-positive-negative-v1"
+status.ACCOUNT_ID = "mexc-usdt-forward-volume-pricing-coinpaprika-100usdt-v2"
+status.STRATEGY_ID = "volume-to-market-cap-first-positive-negative-coinpaprika-v2"
 status.INITIAL_CAPITAL = Decimal("100")
 
 market_data = Path(os.environ.get("MARKET_DATA_DIR", "../market-data"))
