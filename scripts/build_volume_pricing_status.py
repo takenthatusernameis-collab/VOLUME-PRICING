@@ -93,7 +93,7 @@ if coverage_path.is_file():
         f"- Coverage state: **{coverage_state}**",
         f"- Active USDT-settled cross-margin perpetuals: {coverage.get('active_cross_usdt_perpetual_count', '—')}",
         f"- Strategy-eligible crypto/unclassified contracts: {((coverage.get('strategy_universe_summary') or {}).get('eligible_crypto_and_unclassified', '—'))}",
-        f"- Excluded tokenized-stock suffix contracts: {((coverage.get('strategy_universe_summary') or {}).get('excluded_stock_suffix_contracts', '—'))}",
+        f"- Excluded tokenized-stock suffix contracts (overlaps category counts): {((coverage.get('strategy_universe_summary') or {}).get('excluded_stock_suffix_contracts', '—'))}",
         f"- Excluded non-crypto categories: {((coverage.get('strategy_universe_summary') or {}).get('excluded_by_category', {}))}",
         f"- MEXC tickers received: {coverage.get('ticker_coverage', '—')}",
         f"- Missing tickers: {coverage.get('missing_ticker_count', '—')}",
