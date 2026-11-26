@@ -179,7 +179,7 @@ def test_coinpaprika_duplicate_stale_and_multiplier_alias_resolution(monkeypatch
     assert resolved["1000PEPE"]["source_symbol"] == "PEPE"
     assert resolved["1000PEPE"]["symbol_match_type"] == "mexc_1000x_coinpaprika_denomination_alias"
     assert resolved["FILECOIN"]["source_symbol"] == "FIL"
-    assert resolved["FILECOIN"]["symbol_match_type"] == "exact_normalized_name_alias"
+    assert resolved["FILECOIN"]["symbol_match_type"] == "exact_normalized_name_coinpaprika_alias"
     assert report["coverage"]["ambiguous_symbols"] == ["BBB"]
     assert report["coverage"]["stale_symbols"] == ["CCC"]
     assert cache_path.is_file()
