@@ -1,4 +1,5 @@
 from decimal import Decimal
+import json
 
 import scripts.volume_pricing_paper_cycle as strategy
 
@@ -52,6 +53,7 @@ def test_ranking_uses_turnover_to_market_cap_then_direction(monkeypatch):
     market_caps = caps(AAA="100", BBB="100", CCC="100", DDD="100")
     stamp = 1_799_913_600_000
     histories = {iid: [{"timestamp_ms": stamp, "close": "1"}] for iid in (1, 2, 3, 4)}
+    monkeypatch.setattr(strategy, "_universe_history_ready", lambda *args: True)
     monkeypatch.setattr(
         strategy,
         "_load_market_cap_records",
@@ -126,22 +128,51 @@ def test_non_usdt_contracts_never_enter_the_strategy_universe(monkeypatch):
     assert result.research_shorts == []
 
 
-def test_coinpaprika_duplicate_and_stale_symbols_are_rejected(monkeypatch):
+def test_coinpaprika_duplicate_stale_and_multiplier_alias_resolution(monkeypatch, tmp_path):
     now = 1_800_000_000_000
-    rows = [
-        {"symbol": "AAA", "market_cap_usd": "100", "provider": "coinpaprika",
-         "source_updated_ms": now, "source_id": "aaa", "name": "AAA"},
-        {"symbol": "BBB", "market_cap_usd": "100", "provider": "coinpaprika",
-         "source_updated_ms": now, "source_id": "bbb-1", "name": "BBB One"},
-        {"symbol": "BBB", "market_cap_usd": "200", "provider": "coinpaprika",
-         "source_updated_ms": now, "source_id": "bbb-2", "name": "BBB Two"},
-        {"symbol": "CCC", "market_cap_usd": "300", "provider": "coinpaprika",
-         "source_updated_ms": now - 7 * 60 * 60 * 1000, "source_id": "ccc", "name": "CCC"},
-    ]
-    monkeypatch.setattr(strategy, "_fetch_coinpaprika", lambda: rows)
+    cache_path = tmp_path / "provider_cache.json"
+    attempt_path = tmp_path / "daily_attempt.json"
+    monkeypatch.setattr(
+        strategy, "_market_cap_paths", lambda: (cache_path, attempt_path)
+    )
+    monkeypatch.setattr(
+        strategy,
+        "_fetch_coinpaprika_top_tickers",
+        lambda: caps(AAA="100").values(),
+    )
+    monkeypatch.setattr(
+        strategy,
+        "_fetch_coinpaprika_coin_catalogue",
+        lambda: [
+            {"id": "bbb-1", "symbol": "BBB", "name": "BBB One"},
+            {"id": "bbb-2", "symbol": "BBB", "name": "BBB Two"},
+            {"id": "ccc-id", "symbol": "CCC", "name": "CCC"},
+            {"id": "pepe-id", "symbol": "PEPE", "name": "Pepe"},
+        ],
+    )
 
-    resolved, report = strategy._load_market_cap_records({"AAA", "BBB", "CCC"}, now)
+    def single_ticker(coin_id):
+        stamp = now - 7 * 60 * 60 * 1000 if coin_id == "ccc-id" else now
+        symbol = "CCC" if coin_id == "ccc-id" else "PEPE"
+        return {
+            "symbol": symbol,
+            "name": symbol,
+            "market_cap_usd": "200",
+            "source_id": coin_id,
+            "provider": "coinpaprika",
+            "source_updated_ms": stamp,
+        }
 
-    assert set(resolved) == {"AAA"}
+    monkeypatch.setattr(strategy, "_fetch_coinpaprika_single_ticker", single_ticker)
+
+    resolved, report = strategy._load_market_cap_records(
+        {"AAA", "BBB", "CCC", "1000PEPE"}, now
+    )
+
+    assert set(resolved) == {"AAA", "1000PEPE"}
+    assert resolved["1000PEPE"]["source_symbol"] == "PEPE"
+    assert resolved["1000PEPE"]["symbol_match_type"] == "mexc_1000x_denomination_alias"
     assert report["coverage"]["ambiguous_symbols"] == ["BBB"]
     assert report["coverage"]["stale_symbols"] == ["CCC"]
+    assert cache_path.is_file()
+    assert json.loads(attempt_path.read_text())["status"] == "COMPLETED"
