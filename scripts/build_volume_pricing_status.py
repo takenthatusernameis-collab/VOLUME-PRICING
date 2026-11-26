@@ -95,6 +95,7 @@ if coverage_path.is_file():
         f"- Portfolio decision: `{coverage.get('paper_decision_status', 'UNKNOWN')}`",
         f"- Market-cap provider: {((coverage.get('market_cap_source_summary') or {}).get('provider', 'coinpaprika'))} — Powered by CoinPaprika",
         f"- Fresh market-cap matches: {((coverage.get('market_cap_source_summary') or {}).get('coverage', {}).get('resolved_symbols', '—'))}/{((coverage.get('market_cap_source_summary') or {}).get('coverage', {}).get('required_symbols', '—'))}",
+        f"- CoinPaprika calls this daily decision: {((coverage.get('market_cap_source_summary') or {}).get('api_calls_used', '—'))}/{((coverage.get('market_cap_source_summary') or {}).get('api_calls_daily_safety_cap', 642))}",
         "",
         "### Volume-to-market-cap ranking",
         "",
