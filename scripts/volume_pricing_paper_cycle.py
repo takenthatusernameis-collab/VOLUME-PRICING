@@ -165,6 +165,7 @@ def _fetch_coinpaprika_coin_catalogue() -> list[dict[str, Any]]:
         if isinstance(row, dict)
         and row.get("id")
         and str(row.get("symbol", "")).strip()
+        and row.get("is_active", True) is not False
     ]
 
 
