@@ -1,6 +1,6 @@
 # MEXC High-Low ATH/ATL Paper Research
 
-- Run (UTC): 2026-11-26T20:10:30.980000+00:00
+- Run (UTC): 2026-11-26T20:11:09.404000+00:00
 - Active cross-margin USDT perpetuals: not refreshed in snapshot mode
 - Bootstrap remaining: not refreshed in snapshot mode
 - History coverage gate: not checked in snapshot mode
@@ -33,13 +33,13 @@
 
 - Currency: USDT
 - Cash: 99.980101800
-- NAV: 99.517521800
+- NAV: 101.306861800
 - Realized gross P&L: 0
-- Unrealized P&L: -0.462580000
+- Unrealized P&L: 1.326760000
 - Fees paid: 0.019898200
 - Confirmed funding: 0
-- Gross exposure: 2.008550216932753243057545671
-- Net exposure: 0.0005018211777857997263754210568
+- Gross exposure: 1.954006633734261029098425789
+- Net exposure: 0.01815553228399381728750776485
 - Open positions: 2
 - Closed trades: 0
 - Performance report status: INSUFFICIENT_DAILY_EQUITY_HISTORY
