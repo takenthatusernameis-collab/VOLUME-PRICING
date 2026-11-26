@@ -1,5 +1,5 @@
 {
-  "last_run_utc": "2026-11-26T19:35:23.704000+00:00",
+  "last_run_utc": "2026-11-26T19:37:46.033000+00:00",
   "portfolio_state": {
     "account_id": "mexc-usdt-forward-volume-pricing-coinpaprika-100usdt-v2",
     "cash": "100",
@@ -250,16 +250,35 @@
         "short_notional_usdt": "0",
         "timestamp_ms": 1795721723704,
         "utc_date": "2026-11-26"
+      },
+      {
+        "daily_drawdown_pct": "0",
+        "daily_peak_nav": "100",
+        "daily_return_pct": "0",
+        "daily_starting_nav": "100",
+        "daily_starting_reference": "first_observation_of_utc_day",
+        "drawdown_window_reference": "first_observation_of_utc_day",
+        "drawdown_window_starting_nav": "100",
+        "emergency_stop_flattened": false,
+        "emergency_stop_newly_triggered": false,
+        "emergency_stop_triggered": false,
+        "gross_exposure": "0",
+        "long_notional_usdt": "0",
+        "nav": "100",
+        "roi_pct": "0",
+        "short_notional_usdt": "0",
+        "timestamp_ms": 1795721866033,
+        "utc_date": "2026-11-26"
       }
     ],
     "fees_paid": "0",
     "initial_capital": "100",
     "last_decision_attempt_daily_bar_ms": 1795564800000,
     "last_processed_daily_bar_ms": null,
-    "last_snapshot_ms": 1795721723704,
+    "last_snapshot_ms": 1795721866033,
     "partial_realized_net_pnls": [],
     "pending_entry_signal": {
-      "attempt_count": 1,
+      "attempt_count": 2,
       "daily_bar_timestamp_ms": 1795564800000,
       "executable_longs": [
         {
@@ -287,7 +306,7 @@
           "semi_cycle_direction": null
         }
       ],
-      "last_attempt_ms": 1795721723704
+      "last_attempt_ms": 1795721866033
     },
     "positions": [],
     "realized_gross_pnl": "0",
@@ -298,9 +317,9 @@
   },
   "schema_version": 1,
   "state_event": {
-    "batch_hash": "5475a348b38cc792c43b5899a1dfd8317457da01a5a7c3c40bcc92eaf2188831",
-    "commit_sha": "906bbe518c8276f500c219b28627de37490b34e0",
+    "batch_hash": "e989ab65b16fce8f3b4fc461e2ce9fda2437b2f17403e04cc8efe70f7ee696cb",
+    "commit_sha": "aec505cb43687b3bdfa65a2a6180d7ba1da0a1f6",
     "created": true,
-    "path": "events/2026/11/snapshot-1795721723704.json"
+    "path": "events/2026/11/snapshot-1795721866033.json"
   }
 }
