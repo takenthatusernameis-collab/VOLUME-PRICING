@@ -8,8 +8,8 @@
 - Strategy generation: `volume-to-market-cap-first-positive-negative-coinpaprika-v2`
 - Starting capital: **100.00000000 USDT**
 - Account state: **INITIALIZED — FORWARD PAPER**
-- Last report build: 2026-11-26 19:12:34 UTC
-- Latest workflow run: [45881093700](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45881093700) · run #12, attempt 1 · success · push
+- Last report build: 2026-11-26 19:14:13 UTC
+- Latest workflow run: [45881561884](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45881561884) · run #13, attempt 1 · failure · push
 - Latest processed daily candle: —
 - Latest account event: 2026-11-26 19:12:20 UTC
 - Primary execution journal: [PAPER_TRADE_JOURNAL.md](PAPER_TRADE_JOURNAL.md)
@@ -18,25 +18,26 @@
 ## MEXC universe and data coverage
 
 - Coverage state: **BOOTSTRAPPING**
-- Active USDT-settled cross-margin perpetuals: 1087
+- Active USDT-settled cross-margin perpetuals: —
 - Strategy-eligible crypto/unclassified contracts: 611
 - Excluded tokenized-stock suffix contracts (overlaps category counts): 446
 - Excluded non-crypto categories: {'commodity': 13, 'equity': 139, 'fx': 6}
-- MEXC tickers received: 1087
-- Missing tickers: 0
-- History bootstrap remaining: 37
-- API failures: 0
-- Latest completed daily candle (UTC ms): 1795564800000
-- Portfolio decision: `BLOCKED_INCOMPLETE_MARKET_DATA`
+- MEXC tickers received: —
+- Missing tickers: —
+- History bootstrap remaining: —
+- API failures: —
+- Latest completed daily candle (UTC ms): —
+- Portfolio decision: `FAILED`
 - Market-cap provider: coinpaprika — Powered by CoinPaprika
-- Fresh market-cap matches: —/—
-- CoinPaprika calls this daily decision: —/642
+- Fresh market-cap matches: 460/611
+- CoinPaprika calls this daily decision: 37/642
 
 ### Volume-to-market-cap ranking
 
 Numerator: MEXC rolling 24-hour USDT quote turnover. Denominator: circulating market capitalization in USD.
 
 **Highest-ranked positive 24-hour change candidates (long side):**
+- Cycle error: `MarketCapDataError: Fresh, unambiguous market-cap coverage is below the 80% safety gate: 460/611 symbols`
 - No eligible positive-change candidate.
 
 **Highest-ranked negative 24-hour change candidates (short side):**
