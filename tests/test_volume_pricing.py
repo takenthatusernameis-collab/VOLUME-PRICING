@@ -292,6 +292,7 @@ def test_coingecko_keyless_market_pages_fill_coinpaprika_gaps(monkeypatch, tmp_p
     assert resolved["BBB"]["provider"] == "coingecko"
     assert resolved["BBB"]["symbol_match_type"] == "exact_coingecko_top_2000"
     assert report["provider"] == "coinpaprika+coingecko"
+    assert report["attribution"] == "Powered by CoinPaprika; Powered by CoinGecko"
     assert report["coverage"]["resolved_symbols"] == 2
     assert report["coingecko_api_calls_used"] == 1
     assert json.loads(cache_path.read_text())["cache_version"] == 2
