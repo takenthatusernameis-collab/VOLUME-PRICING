@@ -118,45 +118,8 @@ def _record(
     }
 
 
-def _fetch_coinmarketcap() -> list[dict[str, Any]]:
-    base = "https://pro-api.coinmarketcap.com/public-api/v3/cryptocurrency/listings/latest"
-    query = urlencode({
-        "start": 1,
-        "limit": 5000,
-        "convert": "USD",
-        "sort": "market_cap",
-        "sort_dir": "desc",
-    })
-    payload = _http_json(f"{base}?{query}")
-    if not isinstance(payload, dict):
-        raise MarketCapDataError("CoinMarketCap returned a non-object response")
-    status = payload.get("status") or {}
-    if status.get("error_code") not in (None, 0):
-        raise MarketCapDataError(
-            f"CoinMarketCap error {status.get('error_code')}: {status.get('error_message')}"
-        )
-    global_stamp = _iso_ms(status.get("timestamp"))
-    output: list[dict[str, Any]] = []
-    rows = payload.get("data")
-    if not isinstance(rows, list) or not rows:
-        raise MarketCapDataError("CoinMarketCap listings response contained no assets")
-    for row in rows:
-        if not isinstance(row, dict):
-            continue
-        quote = (row.get("quote") or {}).get("USD") or {}
-        stamp = _iso_ms(quote.get("last_updated")) or global_stamp
-        item = _record(
-            row.get("symbol"), row.get("name"), quote.get("market_cap"),
-            row.get("id"), "coinmarketcap", stamp,
-        )
-        if item:
-            output.append(item)
-    if not output:
-        raise MarketCapDataError("CoinMarketCap returned no positive market caps")
-    return output
-
-
 def _fetch_coinpaprika() -> list[dict[str, Any]]:
+    """Fetch CoinPaprika's keyless Free ticker catalogue for personal research use."""
     payload = _http_json("https://api.coinpaprika.com/v1/tickers")
     if not isinstance(payload, list) or not payload:
         raise MarketCapDataError("CoinPaprika tickers response was empty or malformed")
@@ -177,46 +140,6 @@ def _fetch_coinpaprika() -> list[dict[str, Any]]:
     return output
 
 
-def _fetch_coinlore() -> list[dict[str, Any]]:
-    output: list[dict[str, Any]] = []
-    start = 0
-    limit = 1000
-    total: int | None = None
-    for page in range(200):
-        query = urlencode({"start": start, "limit": limit})
-        payload = _http_json(f"https://api.coinlore.net/api/tickers/?{query}")
-        if not isinstance(payload, dict) or not isinstance(payload.get("data"), list):
-            raise MarketCapDataError("CoinLore tickers response was malformed")
-        info = payload.get("info") or {}
-        try:
-            total = int(info.get("coins_num")) if info.get("coins_num") is not None else total
-            stamp = int(info.get("time", 0)) * 1000
-        except (TypeError, ValueError):
-            stamp = 0
-        rows = payload["data"]
-        for row in rows:
-            if not isinstance(row, dict):
-                continue
-            item = _record(
-                row.get("symbol"), row.get("name"), row.get("market_cap_usd"),
-                row.get("id"), "coinlore", stamp or None,
-            )
-            if item:
-                output.append(item)
-        if not rows:
-            break
-        start += len(rows)
-        if total is not None and start >= total:
-            break
-        if len(rows) < limit and total is None:
-            break
-        if page < 199:
-            time.sleep(1.05)
-    if not output:
-        raise MarketCapDataError("CoinLore returned no positive market caps")
-    return output
-
-
 def _group_provider_rows(rows: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for row in rows:
@@ -224,11 +147,6 @@ def _group_provider_rows(rows: list[dict[str, Any]]) -> dict[str, list[dict[str,
         if symbol:
             grouped[symbol].append(row)
     return dict(grouped)
-
-
-def _cache_path() -> Path:
-    market_data = Path(os.environ.get("MARKET_DATA_DIR", "../market-data"))
-    return market_data / "data" / "market_cap" / "provider_cache.json"
 
 
 def _write_json_atomic(path: Path, payload: dict[str, Any]) -> None:
@@ -241,116 +159,54 @@ def _write_json_atomic(path: Path, payload: dict[str, Any]) -> None:
     temporary.replace(path)
 
 
-def _load_market_cap_cache(
+def _load_market_cap_records(
     required_symbols: set[str],
     now_ms: int,
 ) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
-    path = _cache_path()
-    cache: dict[str, Any] = {}
-    if path.is_file():
-        try:
-            loaded = json.loads(path.read_text(encoding="utf-8"))
-            if (
-                isinstance(loaded, dict)
-                and now_ms - int(loaded.get("fetched_at_ms", 0)) <= CACHE_TTL_MS
-                and now_ms >= int(loaded.get("fetched_at_ms", 0))
-            ):
-                cache = loaded
-        except (OSError, ValueError, json.JSONDecodeError):
-            cache = {}
-
-    providers = cache.setdefault("providers", {})
-    attempted = set(cache.setdefault("attempted", []))
-    errors = cache.setdefault("errors", {})
-    provider_order = ("coinmarketcap", "coinpaprika", "coinlore")
-
-    def grouped() -> dict[str, dict[str, list[dict[str, Any]]]]:
-        return {
-            name: _group_provider_rows(rows)
-            for name, rows in providers.items()
-            if isinstance(rows, list)
-        }
-
-    def resolved_symbols() -> set[str]:
-        groups = grouped()
-        resolved: set[str] = set()
-        for symbol in required_symbols:
-            for name in provider_order:
-                matches = groups.get(name, {}).get(symbol, [])
-                if len(matches) == 1:
-                    resolved.add(symbol)
-                    break
-                if len(matches) > 1:
-                    # An ambiguous symbol is deliberately not guessed.
-                    break
-        return resolved
-
-    fetchers = {
-        "coinmarketcap": _fetch_coinmarketcap,
-        "coinpaprika": _fetch_coinpaprika,
-        "coinlore": _fetch_coinlore,
-    }
-    for provider in provider_order:
-        missing = required_symbols - resolved_symbols()
-        if not missing:
-            break
-        if provider in attempted:
-            continue
-        attempted.add(provider)
-        try:
-            providers[provider] = fetchers[provider]()
-            errors.pop(provider, None)
-        except Exception as exc:
-            errors[provider] = f"{type(exc).__name__}: {str(exc)[:300]}"
-        cache["attempted"] = sorted(attempted)
-        cache["fetched_at_ms"] = now_ms
-        cache["providers"] = providers
-        cache["errors"] = errors
-        _write_json_atomic(path, cache)
-
-    groups = grouped()
+    """Fetch one fresh keyless CoinPaprika snapshot; never persist its raw catalogue."""
+    rows = _fetch_coinpaprika()
+    grouped = _group_provider_rows(rows)
     resolved: dict[str, dict[str, Any]] = {}
     ambiguous: list[str] = []
+    stale: list[str] = []
+    missing: list[str] = []
     for symbol in sorted(required_symbols):
-        selected: dict[str, Any] | None = None
-        for provider in provider_order:
-            matches = groups.get(provider, {}).get(symbol, [])
-            if len(matches) > 1:
-                ambiguous.append(symbol)
-                selected = None
-                break
-            if len(matches) == 1:
-                selected = matches[0]
-                break
-        if selected is None:
+        matches = grouped.get(symbol, [])
+        if len(matches) > 1:
+            ambiguous.append(symbol)
             continue
-        stamp = int(selected.get("source_updated_ms", 0))
-        if stamp <= 0 or stamp > now_ms + 300_000 or now_ms - stamp > MAX_SOURCE_AGE_MS:
+        if not matches:
+            missing.append(symbol)
             continue
-        resolved[symbol] = selected
+        record = matches[0]
+        stamp = int(record.get("source_updated_ms", 0))
+        if (
+            stamp <= 0
+            or stamp > now_ms + 300_000
+            or now_ms - stamp > MAX_SOURCE_AGE_MS
+        ):
+            stale.append(symbol)
+            continue
+        resolved[symbol] = record
 
-    if not any(isinstance(rows, list) and rows for rows in providers.values()):
-        details = "; ".join(f"{k}: {v}" for k, v in errors.items())
-        raise MarketCapDataError(
-            "All unauthenticated market-cap providers failed or returned no data. " + details
-        )
-
-    cache["attempted"] = sorted(attempted)
-    cache["fetched_at_ms"] = int(cache.get("fetched_at_ms", now_ms))
-    cache["providers"] = providers
-    cache["errors"] = errors
-    cache["coverage"] = {
+    coverage = {
         "required_symbols": len(required_symbols),
         "resolved_symbols": len(resolved),
-        "unresolved_symbols": sorted(required_symbols - set(resolved)),
-        "ambiguous_symbols": sorted(set(ambiguous)),
+        "missing_symbols": missing,
+        "ambiguous_symbols": ambiguous,
+        "stale_symbols": stale,
     }
-    _write_json_atomic(path, cache)
+    if not resolved:
+        raise MarketCapDataError(
+            "CoinPaprika returned no fresh, unambiguous market-cap matches"
+        )
+    # Keep only summary metadata in the public report. The full provider
+    # catalogue remains in memory and is never committed or redistributed.
     return resolved, {
-        "provider_rows": {name: len(rows) for name, rows in providers.items()},
-        "attempted": sorted(attempted),
-        "errors": dict(errors),
-        "coverage": cache["coverage"],
+        "provider": "coinpaprika",
+        "provider_rows_received": len(rows),
+        "attribution": "Powered by CoinPaprika",
+        "coverage": coverage,
     }
 
 
@@ -380,7 +236,7 @@ def rank_volume_pricing_universe(
         for row in eligible if str(row.get("base_asset", "")).strip()
     }
     now_ms = int(datetime.now(UTC).timestamp() * 1000)
-    market_caps, source_report = _load_market_cap_cache(symbols, now_ms)
+    market_caps, source_report = _load_market_cap_records(symbols, now_ms)
     coverage = source_report["coverage"]
     coverage_fraction = (
         Decimal(coverage["resolved_symbols"]) / Decimal(coverage["required_symbols"])
@@ -437,10 +293,7 @@ def rank_volume_pricing_universe(
             continue
         enriched = dict(instrument)
         enriched.update({
-            "market_cap_usd": str(market_cap),
             "market_cap_provider": str(cap_row.get("provider", "")),
-            "market_cap_source_id": str(cap_row.get("source_id", "")),
-            "market_cap_source_name": str(cap_row.get("name", "")),
             "market_cap_source_updated_ms": int(cap_row.get("source_updated_ms", 0)),
             "mexc_turnover_24h_usdt": str(turnover),
             "mexc_change_24h": str(change),
@@ -494,9 +347,7 @@ def rank_volume_pricing_universe(
                 "direction": "long" if item[3] > 0 else ("short" if item[3] < 0 else "flat"),
                 "mexc_change_24h": str(item[3]),
                 "mexc_turnover_24h_usdt": item[2]["mexc_turnover_24h_usdt"],
-                "market_cap_usd": item[2]["market_cap_usd"],
                 "market_cap_provider": item[2]["market_cap_provider"],
-                "market_cap_source_id": item[2]["market_cap_source_id"],
                 "market_cap_source_updated_ms": item[2]["market_cap_source_updated_ms"],
                 "volume_to_market_cap_ratio": str(item[0]),
                 "volume_to_market_cap_pct": item[2]["volume_to_market_cap_pct"],
@@ -549,7 +400,6 @@ def _ranking_report_rows(
             "volume_to_market_cap_ratio": str(instrument["volume_to_market_cap_ratio"]),
             "volume_to_market_cap_pct": str(instrument["volume_to_market_cap_pct"]),
             "mexc_turnover_24h_usdt": str(instrument["mexc_turnover_24h_usdt"]),
-            "market_cap_usd": str(instrument["market_cap_usd"]),
             "market_cap_provider": str(instrument["market_cap_provider"]),
             "market_cap_source_updated_ms": int(instrument["market_cap_source_updated_ms"]),
             "mexc_change_24h": str(instrument["mexc_change_24h"]),
