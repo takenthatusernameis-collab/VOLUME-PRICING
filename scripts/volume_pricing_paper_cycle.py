@@ -33,6 +33,7 @@ COINPAPRIKA_MAX_SINGLE_LOOKUPS = 640
 COINPAPRIKA_REQUEST_INTERVAL_SECONDS = 0.13
 _LAST_COINPAPRIKA_REQUEST = 0.0
 _PENDING_DECISION_SNAPSHOT: dict[str, Any] | None = None
+_BOOTSTRAP_STATUS: dict[str, Any] | None = None
 USER_AGENT = "volume-pricing-forward-paper/1.0"
 
 
@@ -541,7 +542,14 @@ def rank_volume_pricing_universe(
         for row in eligible if str(row.get("base_asset", "")).strip()
     }
     now_ms = int(datetime.now(UTC).timestamp() * 1000)
-    if not _universe_history_ready(eligible, histories, tickers, as_of_timestamp_ms):
+    if (
+        (_BOOTSTRAP_STATUS is not None and (
+            int(_BOOTSTRAP_STATUS.get("bootstrap_remaining", 1)) > 0
+            or int(_BOOTSTRAP_STATUS.get("api_failure_count", 1)) > 0
+            or not bool(_BOOTSTRAP_STATUS.get("daily_refresh_complete", False))
+        ))
+        or not _universe_history_ready(eligible, histories, tickers, as_of_timestamp_ms)
+    ):
         _PENDING_DECISION_SNAPSHOT = None
         return MEXCRankings(
             research_longs=[],
@@ -797,6 +805,25 @@ def main() -> int:
         )
 
     engine.GitHubStatePublisher = volume_pricing_state_publisher
+
+    global _BOOTSTRAP_STATUS
+    _BOOTSTRAP_STATUS = {}
+    original_bootstrap = engine._bootstrap_or_increment
+    original_daily_refresh_complete = engine._daily_refresh_complete
+
+    def tracked_bootstrap(*args, **kwargs):
+        result = original_bootstrap(*args, **kwargs)
+        _BOOTSTRAP_STATUS["bootstrap_remaining"] = int(result[1])
+        _BOOTSTRAP_STATUS["api_failure_count"] = len(result[2])
+        return result
+
+    def tracked_daily_refresh_complete(*args, **kwargs):
+        result = original_daily_refresh_complete(*args, **kwargs)
+        _BOOTSTRAP_STATUS["daily_refresh_complete"] = bool(result)
+        return result
+
+    engine._bootstrap_or_increment = tracked_bootstrap
+    engine._daily_refresh_complete = tracked_daily_refresh_complete
     market_data = Path(os.environ.get("MARKET_DATA_DIR", "../market-data"))
     report_path = market_data / "data" / "reports" / "mexc" / "latest_cycle.json"
     try:
