@@ -85,13 +85,31 @@ coverage_path = market_data / "data" / "reports" / "mexc" / "latest_cycle.json"
 coverage_note = ""
 if coverage_path.is_file():
     coverage = json.loads(coverage_path.read_text(encoding="utf-8"))
-    coverage_state = "READY" if coverage.get("history_coverage_pass") else "BOOTSTRAPPING"
-    if not coverage.get("history_coverage_pass"):
+    market_cap_summary = coverage.get("market_cap_source_summary") or {}
+    market_cap_coverage = market_cap_summary.get("coverage") or {}
+    market_cap_required = int(market_cap_coverage.get("required_symbols", 0))
+    market_cap_resolved = int(market_cap_coverage.get("resolved_symbols", 0))
+    market_cap_coverage_pass = (
+        market_cap_required > 0
+        and market_cap_resolved / market_cap_required >= 0.80
+    )
+    history_coverage_pass = bool(coverage.get("history_coverage_pass"))
+    if not history_coverage_pass:
+        coverage_state = "BOOTSTRAPPING"
         markdown = markdown.replace("# ACTIVE PAPER STATUS", "# BOOTSTRAPPING PAPER STATUS")
         markdown = markdown.replace(
             "**🟢 ACTIVE · PAPER ONLY · NO LIVE ORDERS**",
             "**BOOTSTRAPPING · PAPER ONLY · NO LIVE ORDERS**",
         )
+    elif market_cap_summary and not market_cap_coverage_pass:
+        coverage_state = "MARKET_CAP_BLOCKED"
+        markdown = markdown.replace("# ACTIVE PAPER STATUS", "# MARKET-CAP COVERAGE BLOCKED")
+        markdown = markdown.replace(
+            "**🟢 ACTIVE · PAPER ONLY · NO LIVE ORDERS**",
+            "**MARKET-CAP COVERAGE BLOCKED · PAPER ONLY · NO LIVE ORDERS**",
+        )
+    else:
+        coverage_state = "READY"
     coverage_note = "\n".join([
         "",
         "## MEXC universe and data coverage",
