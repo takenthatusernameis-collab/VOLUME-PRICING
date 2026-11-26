@@ -67,17 +67,17 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Determine UTC CoinPaprika daily cache key
+      - name: Determine UTC daily market-cap cache key
         id: marketcap-cache-key
         shell: bash
         run: echo "utc_date=$(date -u +%F)" >> "$GITHUB_OUTPUT"
 
-      - name: Restore private CoinPaprika market-cap cache
+      - name: Restore private multi-provider market-cap cache
         id: coinpaprika-cache
         uses: actions/cache/restore@v4
         with:
-          path: market-data/data/market_cap/provider_cache.json
-          key: volume-pricing-coinpaprika-${{ steps.marketcap-cache-key.outputs.utc_date }}
+          path: market-data/data/market_cap/provider_cache_v2.json
+          key: volume-pricing-marketcap-v2-${{ steps.marketcap-cache-key.outputs.utc_date }}
 
       - name: Install MEXC paper engine and test dependencies
         shell: bash
@@ -109,7 +109,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -f data/
           # Never publish a provider's raw market-cap catalogue/cache.
-          git reset -q data/market_cap/provider_cache.json 2>/dev/null || true
+          git reset -q data/market_cap/provider_cache.json data/market_cap/provider_cache_v2.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No public market-data changes."
           else
@@ -117,8 +117,8 @@ jobs:
             git push origin HEAD:market-data
           fi
 
-      - name: Save private CoinPaprika market-cap cache
-        if: always() && steps.coinpaprika-cache.outputs.cache-hit != 'true' && hashFiles('market-data/data/market_cap/provider_cache.json') != ''
+      - name: Save private multi-provider market-cap cache
+        if: always() && steps.coinpaprika-cache.outputs.cache-hit != 'true' && hashFiles('market-data/data/market_cap/provider_cache_v2.json') != ''
         uses: actions/cache/save@v4
         with:
           path: market-data/data/market_cap/provider_cache.json
@@ -189,7 +189,7 @@ jobs:
           name: volume-pricing-mexc-100usdt-paper-status
           path: |
             market-data/data/reports/mexc/
-            market-data/data/market_cap/daily_attempt.json
+            market-data/data/market_cap/daily_attempt_v2.json
             strategy/PAPER_STATUS.md
             strategy/PAPER_TRADE_JOURNAL.md
             strategy/equal_exposure_equity_curve.svg
