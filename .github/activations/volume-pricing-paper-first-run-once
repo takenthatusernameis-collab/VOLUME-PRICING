@@ -8,3 +8,5 @@ Verified v2 state recovery; continue bounded MEXC history bootstrap.
 Bootstrap batch 2; persist crypto-only universe summary in latest status.
 
 Bootstrap batch 3; verify corrected status template and continue paper-data preparation.
+
+Bootstrap batch 4; refresh status after v3-template cleanup.
