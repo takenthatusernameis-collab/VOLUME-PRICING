@@ -37,7 +37,7 @@ A market-cap provider's global 24-hour volume is **not** the numerator. The nume
 
 Symbols are joined conservatively. Ambiguous symbols, missing/zero market caps, stale market-cap observations, stale tickers and invalid turnover are excluded and reported. A portfolio decision requires at least 80% of the distinct eligible MEXC base-asset symbols to have fresh, unambiguous market-cap matches; otherwise the cycle fails closed. A symbol match is not proof of contract identity; the implementation does not guess among duplicate symbols.
 
-Market-cap observations are captured and persisted at decision time. This is a forward paper simulation, not a backtest using today's market capitalization for historical dates.
+At each decision, the public snapshot records the derived volume/market-cap ratio, MEXC turnover, provider attribution and source timestamp. Absolute provider market-cap values remain in the private daily Actions cache and are not published to the repository or workflow artifacts. This is a forward paper simulation, not a backtest using today's market capitalization for historical dates.
 
 ## Status
 
