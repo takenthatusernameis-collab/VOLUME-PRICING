@@ -1,33 +1,33 @@
-# PAPER STATUS — VOLUME PRICING $100 USDT
+# ACTIVE PAPER STATUS — VOLUME PRICING $100 USDT
 
-**BOOTSTRAPPING · PAPER ONLY · NO LIVE ORDERS**
+**🟢 ACTIVE · PAPER ONLY · NO LIVE ORDERS**
 
 **Correct workflow:** [Open active workflow](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/workflows/volume-pricing-paper-cycle.yml)
 
 - Account: `mexc-usdt-forward-volume-pricing-coinpaprika-100usdt-v2`
 - Strategy generation: `volume-to-market-cap-first-positive-negative-coinpaprika-v2`
 - Starting capital: **100.00000000 USDT**
-- Account state: **READY — WAITING FOR FIRST FINANCIAL PAPER EVENT**
-- Last report build: 2026-11-26 11:37:00 UTC
-- Latest workflow run: [45812113812](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45812113812) · run #3, attempt 1 · success · push
+- Account state: **INITIALIZED — FORWARD PAPER**
+- Last report build: 2026-11-26 11:40:46 UTC
+- Latest workflow run: [45812294172](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45812294172) · run #4, attempt 1 · success · push
 - Latest processed daily candle: —
-- Latest account event: —
+- Latest account event: 2026-11-26 11:40:36 UTC
 - Primary execution journal: [PAPER_TRADE_JOURNAL.md](PAPER_TRADE_JOURNAL.md)
 
 
 ## MEXC universe and data coverage
 
 - Coverage state: **BOOTSTRAPPING**
-- Active USDT-settled cross-margin perpetuals: —
+- Active USDT-settled cross-margin perpetuals: 1087
 - Strategy-eligible crypto/unclassified contracts: —
 - Excluded tokenized-stock suffix contracts: —
 - Excluded non-crypto categories: {}
-- MEXC tickers received: —
-- Missing tickers: —
-- History bootstrap remaining: —
-- API failures: —
-- Latest completed daily candle (UTC ms): —
-- Portfolio decision: `PUBLISH_READBACK_VERIFIED_AWAITING_FRESH_CHECKOUT`
+- MEXC tickers received: 1087
+- Missing tickers: 0
+- History bootstrap remaining: 837
+- API failures: 0
+- Latest completed daily candle (UTC ms): 1795564800000
+- Portfolio decision: `BLOCKED_INCOMPLETE_MARKET_DATA`
 - Market-cap provider: coinpaprika — Powered by CoinPaprika
 - Fresh market-cap matches: —/—
 - CoinPaprika calls this daily decision: —/642
@@ -58,8 +58,8 @@ Portfolio transitions remain blocked until the complete eligible MEXC USDT unive
 | Gross exposure | 0.000× NAV |
 | Net exposure | 0.000× NAV |
 | Current drawdown from risk-window peak | +0.000% |
-| Lifetime / cross-session maximum drawdown | Unavailable — no account observations yet |
-| Worst risk-session maximum drawdown | Unavailable — no account observations yet |
+| Lifetime / cross-session maximum drawdown | +0.000% |
+| Worst risk-session maximum drawdown | +0.000% |
 | Sharpe ratio | Unavailable — sample gate not met |
 | Sortino ratio | Unavailable — sample gate not met |
 | Annualized daily volatility | Unavailable — sample gate not met |
@@ -68,7 +68,7 @@ Portfolio transitions remain blocked until the complete eligible MEXC USDT unive
 
 | Session start (UTC) | Starting NAV | Latest NAV | Max drawdown | Marks |
 |---|---:|---:|---:|---:|
-| No risk sessions observed | — | — | — | 0 |
+| 2026-11-26 00:00:00 UTC | 100.00000000 | 100.00000000 | +0.000% | 1 |
 
 ## Open positions
 
@@ -99,7 +99,7 @@ At each rebalance, the quieter leg receives the larger share using inverse 30-co
 
 ## Next workflow action
 
-The next eligible cycle can process the latest genuine completed UTC daily candle; the new account has no consumed-candle watermark.
+The next daily decision requires a newer completed UTC candle and a passing data-coverage gate.
 
 The daily-candle watermark is not advanced by this report. Only the paper workflow can consume a completed candle after full-history and execution gates pass. A blocked or incomplete run remains visible.
 
