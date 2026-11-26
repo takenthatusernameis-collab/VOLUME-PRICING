@@ -32,7 +32,11 @@ MAX_TICKER_SPREAD_MS = 5 * 60 * 1000
 DAY_MS = 86_400_000
 COINPAPRIKA_MAX_SINGLE_LOOKUPS = 640
 COINPAPRIKA_REQUEST_INTERVAL_SECONDS = 0.13
+COINGECKO_REQUEST_INTERVAL_SECONDS = 12.5
+COINGECKO_MARKET_PAGES = 8
+MARKET_CAP_CACHE_VERSION = 2
 _LAST_COINPAPRIKA_REQUEST = 0.0
+_LAST_COINGECKO_REQUEST = 0.0
 _PENDING_DECISION_SNAPSHOT: dict[str, Any] | None = None
 _BOOTSTRAP_STATUS: dict[str, Any] | None = None
 _STRATEGY_UNIVERSE_SUMMARY: dict[str, Any] | None = None
@@ -126,6 +130,56 @@ def _coinpaprika_get(url: str, *, retries: int = 4) -> Any:
         time.sleep(COINPAPRIKA_REQUEST_INTERVAL_SECONDS - elapsed)
     _LAST_COINPAPRIKA_REQUEST = time.monotonic()
     return _http_json(url, retries=retries)
+
+
+def _coingecko_get(url: str) -> Any:
+    """Use CoinGecko's no-key public pool at a conservative five calls/minute."""
+    global _LAST_COINGECKO_REQUEST
+    elapsed = time.monotonic() - _LAST_COINGECKO_REQUEST
+    if elapsed < COINGECKO_REQUEST_INTERVAL_SECONDS:
+        time.sleep(COINGECKO_REQUEST_INTERVAL_SECONDS - elapsed)
+    _LAST_COINGECKO_REQUEST = time.monotonic()
+    return _http_json(url, retries=4)
+
+
+def _fetch_coingecko_market_pages() -> list[dict[str, Any]]:
+    """Fetch the top 2,000 market-cap records in eight public 250-asset pages."""
+    output: list[dict[str, Any]] = []
+    for page in range(1, COINGECKO_MARKET_PAGES + 1):
+        query = urlencode({
+            "vs_currency": "usd",
+            "order": "market_cap_desc",
+            "per_page": 250,
+            "page": page,
+            "sparkline": "false",
+        })
+        payload = _coingecko_get(
+            f"https://api.coingecko.com/api/v3/coins/markets?{query}"
+        )
+        if not isinstance(payload, list):
+            raise MarketCapDataError(
+                f"CoinGecko markets page {page} returned a malformed response"
+            )
+        if not payload:
+            if page == 1:
+                raise MarketCapDataError("CoinGecko markets endpoint returned no assets")
+            break
+        for row in payload:
+            if not isinstance(row, dict):
+                continue
+            item = _record(
+                row.get("symbol"),
+                row.get("name"),
+                row.get("market_cap"),
+                row.get("id"),
+                "coingecko",
+                _iso_ms(row.get("last_updated")),
+            )
+            if item:
+                output.append(item)
+    if not output:
+        raise MarketCapDataError("CoinGecko supplied no valid market-cap records")
+    return output
 
 
 def _record(
@@ -233,7 +287,7 @@ def _write_json_atomic(path: Path, payload: dict[str, Any]) -> None:
 def _market_cap_paths() -> tuple[Path, Path]:
     root = Path(os.environ.get("MARKET_DATA_DIR", "../market-data"))
     directory = root / "data" / "market_cap"
-    return directory / "provider_cache.json", directory / "daily_attempt.json"
+    return directory / "provider_cache_v2.json", directory / "daily_attempt_v2.json"
 
 
 def _record_is_fresh(record: dict[str, Any], now_ms: int) -> bool:
@@ -249,7 +303,7 @@ def _load_market_cap_records(
     required_symbols: set[str],
     now_ms: int,
 ) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
-    """Resolve the full MEXC symbol set with CoinPaprika's keyless single-coin endpoint."""
+    """Resolve market caps using keyless CoinPaprika plus paginated CoinGecko."""
     cache_path, attempt_path = _market_cap_paths()
     today = datetime.fromtimestamp(now_ms / 1000, UTC).date().isoformat()
     required = sorted(required_symbols)
@@ -259,7 +313,8 @@ def _load_market_cap_records(
             cached = json.loads(cache_path.read_text(encoding="utf-8"))
             records = cached.get("records", {})
             if (
-                cached.get("decision_date") == today
+                cached.get("cache_version") == MARKET_CAP_CACHE_VERSION
+                and cached.get("decision_date") == today
                 and cached.get("required_symbols") == required
                 and isinstance(records, dict)
                 and now_ms - int(cached.get("fetched_at_ms", 0)) <= MAX_SOURCE_AGE_MS
@@ -274,8 +329,8 @@ def _load_market_cap_records(
             attempt = json.loads(attempt_path.read_text(encoding="utf-8"))
             if attempt.get("decision_date") == today:
                 raise MarketCapDataError(
-                    "CoinPaprika lookup already attempted today; refusing repeated calls "
-                    "without a complete private Actions cache. "
+                    "Market-cap providers already attempted today; refusing repeated "
+                    "calls without a complete private Actions cache. "
                     f"Previous status={attempt.get('status', 'UNKNOWN')}"
                 )
         except MarketCapDataError:
@@ -285,13 +340,15 @@ def _load_market_cap_records(
 
     attempt = {
         "decision_date": today,
+        "cache_version": MARKET_CAP_CACHE_VERSION,
         "status": "IN_PROGRESS",
         "started_at_ms": now_ms,
         "required_symbols": len(required),
-        "provider": "coinpaprika",
+        "providers": ["coinpaprika", "coingecko"],
     }
     _write_json_atomic(attempt_path, attempt)
     individual_calls = 0
+    coingecko_calls = 0
 
     try:
         top_rows = _fetch_coinpaprika_top_tickers()
@@ -304,66 +361,123 @@ def _load_market_cap_records(
             if normalized_name:
                 catalogue_name_groups[normalized_name].append(coin)
 
+        coingecko_error: str | None = None
+        try:
+            coingecko_rows = _fetch_coingecko_market_pages()
+            coingecko_calls = COINGECKO_MARKET_PAGES
+        except MarketCapDataError as exc:
+            coingecko_rows = []
+            coingecko_error = f"{type(exc).__name__}: {str(exc)[:350]}"
+        coingecko_groups = _group_provider_rows(coingecko_rows)
+        coingecko_name_groups: dict[str, list[dict[str, Any]]] = defaultdict(list)
+        for coin in coingecko_rows:
+            normalized_name = _normalize_provider_name(coin.get("name"))
+            if normalized_name:
+                coingecko_name_groups[normalized_name].append(coin)
+
         resolved: dict[str, dict[str, Any]] = {}
         ambiguous: list[str] = []
         stale: list[str] = []
         missing: list[str] = []
         pending: dict[str, tuple[str, str, str]] = {}
 
+        def resolve_coingecko(
+            base_symbol: str,
+            matches: list[dict[str, Any]],
+            match_type: str,
+            source_symbol: str,
+        ) -> bool:
+            if len(matches) > 1:
+                ambiguous.append(base_symbol)
+                return True
+            if len(matches) != 1:
+                return False
+            record = dict(matches[0])
+            if not _record_is_fresh(record, now_ms):
+                stale.append(base_symbol)
+                return True
+            record["source_symbol"] = source_symbol
+            record["symbol_match_type"] = match_type
+            resolved[base_symbol] = record
+            return True
+
         for base_symbol in required:
             top_matches = top_groups.get(base_symbol, [])
-            if len(top_matches) > 1:
-                ambiguous.append(base_symbol)
-                continue
             if len(top_matches) == 1 and _record_is_fresh(top_matches[0], now_ms):
                 record = dict(top_matches[0])
                 record["source_symbol"] = base_symbol
-                record["symbol_match_type"] = "exact_top_2000"
+                record["symbol_match_type"] = "exact_coinpaprika_top_2000"
                 resolved[base_symbol] = record
                 continue
 
+            # CoinGecko is a second, independent keyless market-cap catalogue.
+            # Use it when CoinPaprika's bulk list omits the exact symbol.
+            if resolve_coingecko(
+                base_symbol,
+                coingecko_groups.get(base_symbol, []),
+                "exact_coingecko_top_2000",
+                base_symbol,
+            ):
+                continue
+
+            if len(top_matches) > 1:
+                ambiguous.append(base_symbol)
+                continue
+
             coin_matches = catalogue_groups.get(base_symbol, [])
-            match_type = "exact"
+            match_type = "exact_coinpaprika_single_ticker"
             source_symbol = base_symbol
+
             if len(coin_matches) > 1:
                 ambiguous.append(base_symbol)
                 continue
+
             if not coin_matches:
-                # MEXC uses denomination-prefixed contracts for some assets.
-                # Prefer exact symbols; only strip a known multiplier prefix
-                # when the underlying CoinPaprika symbol is unique.
-                alias_matches: list[dict[str, Any]] = []
+                alias_resolved = False
                 for prefix in ("1000000", "10000", "1000"):
-                    if base_symbol.startswith(prefix):
-                        candidate_symbol = base_symbol[len(prefix):]
-                        candidate_matches = catalogue_groups.get(candidate_symbol, [])
-                        if len(candidate_matches) == 1:
-                            alias_matches = candidate_matches
-                            source_symbol = candidate_symbol
-                            match_type = f"mexc_{prefix}x_denomination_alias"
-                            break
-                        if len(candidate_matches) > 1:
-                            break
-                if len(alias_matches) > 1:
+                    if not base_symbol.startswith(prefix):
+                        continue
+                    candidate_symbol = base_symbol[len(prefix):]
+                    if resolve_coingecko(
+                        base_symbol,
+                        coingecko_groups.get(candidate_symbol, []),
+                        f"mexc_{prefix}x_coingecko_denomination_alias",
+                        candidate_symbol,
+                    ):
+                        alias_resolved = True
+                        break
+                    candidate_matches = catalogue_groups.get(candidate_symbol, [])
+                    if len(candidate_matches) == 1:
+                        coin_matches = candidate_matches
+                        source_symbol = candidate_symbol
+                        match_type = f"mexc_{prefix}x_coinpaprika_denomination_alias"
+                        alias_resolved = True
+                        break
+                    if len(candidate_matches) > 1:
+                        ambiguous.append(base_symbol)
+                        alias_resolved = True
+                        break
+                if alias_resolved:
+                    continue
+
+                normalized_base = _normalize_provider_name(base_symbol)
+                if resolve_coingecko(
+                    base_symbol,
+                    coingecko_name_groups.get(normalized_base, []),
+                    "exact_normalized_name_coingecko_alias",
+                    str((coingecko_name_groups.get(normalized_base) or [{}])[0].get("symbol", base_symbol)).upper(),
+                ):
+                    continue
+                name_matches = catalogue_name_groups.get(normalized_base, [])
+                if len(name_matches) > 1:
                     ambiguous.append(base_symbol)
                     continue
-                if alias_matches:
-                    coin_matches = alias_matches
-                else:
-                    # Some MEXC contracts use a project name as base_asset
-                    # while the provider uses the canonical ticker (e.g. FILECOIN/FIL).
-                    name_matches = catalogue_name_groups.get(
-                        _normalize_provider_name(base_symbol), []
-                    )
-                    if len(name_matches) > 1:
-                        ambiguous.append(base_symbol)
-                        continue
-                    if not name_matches:
-                        missing.append(base_symbol)
-                        continue
-                    coin_matches = name_matches
-                    source_symbol = str(coin_matches[0].get("symbol", "")).upper()
-                    match_type = "exact_normalized_name_alias"
+                if not name_matches:
+                    missing.append(base_symbol)
+                    continue
+                coin_matches = name_matches
+                source_symbol = str(coin_matches[0].get("symbol", "")).upper()
+                match_type = "exact_normalized_name_coinpaprika_alias"
 
             coin_id = str(coin_matches[0].get("id", ""))
             if not coin_id:
@@ -379,15 +493,20 @@ def _load_market_cap_records(
             )
 
         request_errors: list[str] = []
-        for base_symbol, (coin_id, source_symbol, match_type) in pending.items():
+        coinpaprika_single_lookup_plan_limited = False
+        pending_items = list(pending.items())
+        for index, (base_symbol, (coin_id, source_symbol, match_type)) in enumerate(pending_items):
             individual_calls += 1
             try:
                 record = _fetch_coinpaprika_single_ticker(coin_id)
             except MarketCapDataError as exc:
                 message = str(exc)
-                if not any(code in message for code in ("HTTP 404",)):
-                    # Stop immediately on rate-limit, auth/plan, server or network
-                    # failures; do not burn the remaining monthly call budget.
+                if any(code in message for code in ("HTTP 402", "HTTP 403")):
+                    coinpaprika_single_lookup_plan_limited = True
+                    request_errors.append(f"{base_symbol}:{message[:180]}")
+                    missing.extend(symbol for symbol, _ in pending_items[index:])
+                    break
+                if "HTTP 404" not in message:
                     raise
                 request_errors.append(f"{base_symbol}:{message[:180]}")
                 missing.append(base_symbol)
@@ -409,21 +528,46 @@ def _load_market_cap_records(
             "ambiguous_symbols": sorted(set(ambiguous)),
             "stale_symbols": sorted(set(stale)),
         }
-        calls_used = 2 + individual_calls
+        providers_used = sorted({
+            str(record.get("provider", ""))
+            for record in resolved.values()
+            if record.get("provider")
+        })
+        provider_labels = {
+            "coinpaprika": "CoinPaprika",
+            "coingecko": "CoinGecko",
+        }
+        provider = "+".join(providers_used) if providers_used else "none"
+        attribution = "; ".join(
+            f"Powered by {provider_labels.get(name, name)}"
+            for name in providers_used
+        )
+        coinpaprika_calls_used = 2 + individual_calls
+        api_calls_used = coinpaprika_calls_used + coingecko_calls
         summary = {
-            "provider": "coinpaprika",
-            "attribution": "Powered by CoinPaprika",
+            "provider": provider,
+            "attribution": attribution,
             "top_ticker_rows_received": len(top_rows),
             "coin_catalogue_rows_received": len(catalogue),
+            "coingecko_rows_received": len(coingecko_rows),
+            "coingecko_pages_requested": coingecko_calls,
+            "coingecko_request_error": coingecko_error,
+            "coingecko_request_interval_seconds": COINGECKO_REQUEST_INTERVAL_SECONDS,
             "individual_ticker_lookups": individual_calls,
-            "api_calls_used": calls_used,
-            "api_calls_daily_safety_cap": 642,
+            "coinpaprika_single_lookup_plan_limited": coinpaprika_single_lookup_plan_limited,
+            "coinpaprika_api_calls_used": coinpaprika_calls_used,
+            "coinpaprika_api_calls_daily_safety_cap": 642,
+            "coingecko_api_calls_used": coingecko_calls,
+            "coingecko_api_calls_daily_safety_cap": COINGECKO_MARKET_PAGES,
+            "api_calls_used": api_calls_used,
+            "api_calls_daily_safety_cap": 650,
             "request_errors": request_errors,
             "coverage": coverage,
         }
         cache_payload = {
+            "cache_version": MARKET_CAP_CACHE_VERSION,
             "decision_date": today,
-            "fetched_at_ms": now_ms,
+            "fetched_at_ms": int(datetime.now(UTC).timestamp() * 1000),
             "required_symbols": required,
             "records": resolved,
             "summary": summary,
@@ -433,7 +577,9 @@ def _load_market_cap_records(
             **attempt,
             "status": "COMPLETED",
             "completed_at_ms": int(datetime.now(UTC).timestamp() * 1000),
-            "api_calls_used": calls_used,
+            "api_calls_used": api_calls_used,
+            "coinpaprika_api_calls_used": coinpaprika_calls_used,
+            "coingecko_api_calls_used": coingecko_calls,
             "resolved_symbols": len(resolved),
             "required_symbols": len(required),
         })
@@ -443,7 +589,7 @@ def _load_market_cap_records(
             **attempt,
             "status": "FAILED",
             "completed_at_ms": int(datetime.now(UTC).timestamp() * 1000),
-            "api_calls_used": 2 + individual_calls,
+            "api_calls_used": 2 + individual_calls + coingecko_calls,
             "error": f"{type(exc).__name__}: {str(exc)[:500]}",
         })
         raise
