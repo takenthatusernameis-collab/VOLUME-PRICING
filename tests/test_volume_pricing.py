@@ -37,7 +37,6 @@ def caps(**values: str) -> dict[str, dict]:
 
 
 def test_ranking_uses_turnover_to_market_cap_then_direction(monkeypatch, tmp_path):
-    monkeypatch.setattr(strategy, "_cache_path", lambda: tmp_path / "provider_cache.json")
     rows = [
         instrument(1, "AAA_USDT", "AAA"),
         instrument(2, "BBB_USDT", "BBB"),
@@ -55,7 +54,7 @@ def test_ranking_uses_turnover_to_market_cap_then_direction(monkeypatch, tmp_pat
     histories = {iid: [{"timestamp_ms": stamp, "close": "1"}] for iid in (1, 2, 3, 4)}
     monkeypatch.setattr(
         strategy,
-        "_load_market_cap_cache",
+        "_load_market_cap_records",
         lambda required, now: (market_caps, {"coverage": {"resolved_symbols": 4, "required_symbols": 4}}),
     )
 
