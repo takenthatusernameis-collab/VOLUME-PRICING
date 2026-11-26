@@ -134,8 +134,8 @@ def test_non_usdt_contracts_never_enter_the_strategy_universe(monkeypatch):
 
 def test_coinpaprika_duplicate_stale_and_multiplier_alias_resolution(monkeypatch, tmp_path):
     now = 1_800_000_000_000
-    cache_path = tmp_path / "provider_cache.json"
-    attempt_path = tmp_path / "daily_attempt.json"
+    cache_path = tmp_path / "provider_cache_v2.json"
+    attempt_path = tmp_path / "daily_attempt_v2.json"
     monkeypatch.setattr(
         strategy, "_market_cap_paths", lambda: (cache_path, attempt_path)
     )
@@ -296,3 +296,51 @@ def test_coingecko_keyless_market_pages_fill_coinpaprika_gaps(monkeypatch, tmp_p
     assert report["coingecko_api_calls_used"] == 1
     assert json.loads(cache_path.read_text())["cache_version"] == 2
     assert json.loads(attempt_path.read_text())["status"] == "COMPLETED"
+
+
+def test_coingecko_fallback_survives_coinpaprika_plan_limit_but_reports_missing(monkeypatch, tmp_path):
+    now = 1_800_000_000_000
+    cache_path = tmp_path / "provider_cache_v2.json"
+    attempt_path = tmp_path / "daily_attempt_v2.json"
+    monkeypatch.setattr(
+        strategy, "_market_cap_paths", lambda: (cache_path, attempt_path)
+    )
+    monkeypatch.setattr(strategy, "COINGECKO_MARKET_PAGES", 1)
+    monkeypatch.setattr(
+        strategy,
+        "_fetch_coinpaprika_top_tickers",
+        lambda: [{
+            "symbol": "AAA", "name": "AAA", "market_cap_usd": "100",
+            "source_id": "aaa-paprika", "provider": "coinpaprika",
+            "source_updated_ms": now,
+        }],
+    )
+    monkeypatch.setattr(
+        strategy,
+        "_fetch_coinpaprika_coin_catalogue",
+        lambda: [
+            {"id": "bbb-paprika", "symbol": "BBB", "name": "BBB"},
+            {"id": "ccc-paprika", "symbol": "CCC", "name": "CCC"},
+        ],
+    )
+    monkeypatch.setattr(
+        strategy,
+        "_fetch_coingecko_market_pages",
+        lambda: [{
+            "symbol": "BBB", "name": "BBB", "market_cap_usd": "200",
+            "source_id": "bbb-gecko", "provider": "coingecko",
+            "source_updated_ms": now,
+        }],
+    )
+
+    def plan_limited(_coin_id):
+        raise strategy.MarketCapDataError("HTTP 402 from CoinPaprika ticker")
+
+    monkeypatch.setattr(strategy, "_fetch_coinpaprika_single_ticker", plan_limited)
+
+    resolved, report = strategy._load_market_cap_records({"AAA", "BBB", "CCC"}, now)
+
+    assert set(resolved) == {"AAA", "BBB"}
+    assert report["coinpaprika_single_lookup_plan_limited"] is True
+    assert report["coverage"]["missing_symbols"] == ["CCC"]
+    assert report["coverage"]["resolved_symbols"] == 2
