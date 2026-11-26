@@ -433,13 +433,24 @@ def main() -> int:
         return original_instruments(self, usdt_only=True)
 
     engine.MEXCPublicClient.instruments = usdt_instruments
-    result = int(engine._run())
+    market_data = Path(os.environ.get("MARKET_DATA_DIR", "../market-data"))
+    report_path = market_data / "data" / "reports" / "mexc" / "latest_cycle.json"
+    try:
+        result = int(engine._run())
+    except Exception as exc:
+        failure_report = {
+            "mode": "VOLUME_PRICING_CYCLE_EXCEPTION",
+            "paper_decision_status": "FAILED",
+            "generated_at_ms": int(datetime.now(UTC).timestamp() * 1000),
+            "history_coverage_pass": False,
+            "cycle_exception": f"{type(exc).__name__}: {str(exc)[:1000]}",
+        }
+        _write_json_atomic(report_path, failure_report)
+        raise
 
     # Publish the full ranking only after the shared engine confirms that the
     # entire eligible universe has current daily data and fresh tickers. During
     # bootstrap, provisional rankings never become the frozen daily snapshot.
-    market_data = Path(os.environ.get("MARKET_DATA_DIR", "../market-data"))
-    report_path = market_data / "data" / "reports" / "mexc" / "latest_cycle.json"
     if _PENDING_DECISION_SNAPSHOT is not None and report_path.is_file():
         report = json.loads(report_path.read_text(encoding="utf-8"))
         report["market_cap_source_summary"] = _PENDING_DECISION_SNAPSHOT["market_cap_sources"]
