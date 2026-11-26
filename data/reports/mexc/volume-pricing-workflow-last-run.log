@@ -7,9 +7,9 @@
   "emergency_exits": [],
   "emergency_risk_status": "MONITORING_ONLY_NO_STRATEGY_DECISIONS",
   "entry_retry": {
-    "attempt_count": 2,
+    "attempt_count": 3,
     "daily_bar_timestamp_ms": 1795564800000,
-    "error": "MEXCExecutionUnavailable: No candidate pair passed independent NAV sizing and public-depth checks; 1 fill attempt(s) failed; last failure: BULLA_USDT: ExecutionImpactExceeded: Modeled shortfall 43.22938642931637064223105100 bp",
+    "error": "MEXCExecutionUnavailable: No candidate pair passed independent NAV sizing and public-depth checks; 1 fill attempt(s) failed; last failure: BULLA_USDT: ExecutionImpactExceeded: Modeled shortfall 20.07119140917112859322186100 bp",
     "status": "RETRY_EXECUTION_BLOCKED"
   },
   "excluded_or_unranked_sample": [],
@@ -301,6 +301,25 @@
         "short_notional_usdt": "0",
         "timestamp_ms": 1795721866033,
         "utc_date": "2026-11-26"
+      },
+      {
+        "daily_drawdown_pct": "0",
+        "daily_peak_nav": "100",
+        "daily_return_pct": "0",
+        "daily_starting_nav": "100",
+        "daily_starting_reference": "first_observation_of_utc_day",
+        "drawdown_window_reference": "first_observation_of_utc_day",
+        "drawdown_window_starting_nav": "100",
+        "emergency_stop_flattened": false,
+        "emergency_stop_newly_triggered": false,
+        "emergency_stop_triggered": false,
+        "gross_exposure": "0",
+        "long_notional_usdt": "0",
+        "nav": "100",
+        "roi_pct": "0",
+        "short_notional_usdt": "0",
+        "timestamp_ms": 1795721956080,
+        "utc_date": "2026-11-26"
       }
     ],
     "fees_paid": "0",
@@ -343,7 +362,7 @@
     "nav": "100",
     "roi_pct": "0",
     "short_notional_usdt": "0",
-    "timestamp_ms": 1795721866033,
+    "timestamp_ms": 1795721956080,
     "utc_date": "2026-11-26"
   },
   "position_ticker_errors": [],
@@ -352,12 +371,12 @@
   "research_long_top": [],
   "research_refresh_performed": false,
   "research_short_top": [],
-  "run_utc": "2026-11-26T19:37:46.033000+00:00",
+  "run_utc": "2026-11-26T19:39:16.080000+00:00",
   "state_event": {
-    "batch_hash": "e989ab65b16fce8f3b4fc461e2ce9fda2437b2f17403e04cc8efe70f7ee696cb",
-    "commit_sha": "aec505cb43687b3bdfa65a2a6180d7ba1da0a1f6",
+    "batch_hash": "cde3b12c61b1208c70b871dd9fd2582a133c2e989270604a4952a4c095a7d4a1",
+    "commit_sha": "0b96a3480f1d26318deb1dec870b9ee1c32e22da",
     "created": true,
-    "path": "events/2026/11/snapshot-1795721866033.json"
+    "path": "events/2026/11/snapshot-1795721956080.json"
   },
   "state_write_mode": "UNPROTECTED_SINGLE_WRITER_APPEND_ONLY",
   "ticker_coverage": 0,
