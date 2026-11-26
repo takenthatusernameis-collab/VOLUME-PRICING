@@ -603,6 +603,25 @@ def _load_market_cap_records(
         raise
 
 
+def _volume_pricing_daily_refresh_due(
+    original_due: Callable[[dict[str, Any], int], bool],
+    manifest: dict[str, Any],
+    latest_bar_ms: int,
+    market_data_dir: Path,
+) -> bool:
+    """Freeze one ranking per completed daily candle after its decision snapshot is durable."""
+    decision_path = (
+        market_data_dir
+        / "data"
+        / "market_cap"
+        / "decisions"
+        / f"daily_bar_{int(latest_bar_ms)}.json"
+    )
+    if decision_path.is_file():
+        return False
+    return bool(original_due(manifest, latest_bar_ms))
+
+
 def _universe_history_ready(
     eligible: list[dict[str, Any]],
     histories: dict[int, list[dict[str, Any]]],
@@ -997,6 +1016,17 @@ def main() -> int:
     engine._bootstrap_or_increment = tracked_bootstrap
     engine._daily_refresh_complete = tracked_daily_refresh_complete
     market_data = Path(os.environ.get("MARKET_DATA_DIR", "../market-data"))
+    original_daily_refresh_due = engine._daily_refresh_due
+
+    def volume_pricing_daily_refresh_due(manifest, latest_bar_ms):
+        return _volume_pricing_daily_refresh_due(
+            original_daily_refresh_due,
+            manifest,
+            latest_bar_ms,
+            market_data,
+        )
+
+    engine._daily_refresh_due = volume_pricing_daily_refresh_due
     report_path = market_data / "data" / "reports" / "mexc" / "latest_cycle.json"
     try:
         result = int(engine._run())
