@@ -537,7 +537,7 @@ def _load_market_cap_records(
             "coinpaprika": "CoinPaprika",
             "coingecko": "CoinGecko",
         }
-        provider = "+".join(providers_used) if providers_used else "none"
+        provider = "+".join(name for name in ("coinpaprika", "coingecko") if name in providers_used) or "none"
         attribution = "; ".join(
             f"Powered by {provider_labels.get(name, name)}"
             for name in providers_used
