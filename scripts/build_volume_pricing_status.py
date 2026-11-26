@@ -113,8 +113,7 @@ if coverage_path.is_file():
         coverage_note += "\n" + "\n".join(
             f"- {row.get('symbol', '—')}: ratio={row.get('volume_to_market_cap_pct', '—')}%, "
             f"MEXC 24h change={row.get('mexc_change_24h', '—')}, "
-            f"market cap={row.get('market_cap_usd', '—')} USD "
-            f"({row.get('market_cap_provider', '—')})"
+            f"market-cap source={row.get('market_cap_provider', '—')}"
             for row in short_preview
         )
     else:
