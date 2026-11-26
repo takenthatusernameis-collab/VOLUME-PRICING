@@ -86,6 +86,16 @@ coverage_note = ""
 if coverage_path.is_file():
     coverage = json.loads(coverage_path.read_text(encoding="utf-8"))
     market_cap_summary = coverage.get("market_cap_source_summary") or {}
+    if not market_cap_summary:
+        private_cache_path = market_data / "data" / "market_cap" / "provider_cache_v2.json"
+        if private_cache_path.is_file():
+            try:
+                private_cache = json.loads(private_cache_path.read_text(encoding="utf-8"))
+                market_cap_summary = private_cache.get("summary") or {}
+                if market_cap_summary:
+                    coverage["market_cap_source_summary"] = market_cap_summary
+            except (OSError, ValueError, TypeError, json.JSONDecodeError):
+                market_cap_summary = {}
     market_cap_coverage = market_cap_summary.get("coverage") or {}
     market_cap_required = int(market_cap_coverage.get("required_symbols", 0))
     market_cap_resolved = int(market_cap_coverage.get("resolved_symbols", 0))
