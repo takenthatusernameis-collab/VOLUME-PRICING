@@ -28,6 +28,10 @@ STRATEGY_ID = "volume-to-market-cap-first-positive-negative-coinpaprika-v2"
 INITIAL_CAPITAL = Decimal("100")
 MAX_SOURCE_AGE_MS = 6 * 60 * 60 * 1000
 MAX_TICKER_SPREAD_MS = 5 * 60 * 1000
+DAY_MS = 86_400_000
+COINPAPRIKA_MAX_SINGLE_LOOKUPS = 640
+COINPAPRIKA_REQUEST_INTERVAL_SECONDS = 0.13
+_LAST_COINPAPRIKA_REQUEST = 0.0
 _PENDING_DECISION_SNAPSHOT: dict[str, Any] | None = None
 USER_AGENT = "volume-pricing-forward-paper/1.0"
 
@@ -58,21 +62,20 @@ def _iso_ms(value: object) -> int | None:
         return None
 
 
-def _http_json(url: str, *, timeout: int = 30) -> Any:
+def _http_json(url: str, *, timeout: int = 30, retries: int = 4) -> Any:
     request = Request(
         url,
         headers={"Accept": "application/json", "User-Agent": USER_AGENT},
         method="GET",
     )
     last_error: Exception | None = None
-    for attempt in range(5):
+    for attempt in range(retries + 1):
         try:
             with urlopen(request, timeout=timeout) as response:
-                payload = json.loads(response.read().decode("utf-8"))
-                return payload
+                return json.loads(response.read().decode("utf-8"))
         except HTTPError as exc:
             last_error = exc
-            if exc.code == 429 or 500 <= exc.code < 600:
+            if (exc.code == 429 or 500 <= exc.code < 600) and attempt < retries:
                 retry_after = exc.headers.get("Retry-After")
                 try:
                     delay = max(float(retry_after or 0), min(2 ** attempt, 16))
@@ -83,10 +86,20 @@ def _http_json(url: str, *, timeout: int = 30) -> Any:
             raise MarketCapDataError(f"HTTP {exc.code} from {url.split('?')[0]}") from exc
         except (URLError, TimeoutError, OSError, json.JSONDecodeError) as exc:
             last_error = exc
-            time.sleep(min(2 ** attempt, 16))
+            if attempt < retries:
+                time.sleep(min(2 ** attempt, 16))
     raise MarketCapDataError(
         f"Request failed for {url.split('?')[0]}: {type(last_error).__name__}: {last_error}"
     )
+
+
+def _coinpaprika_get(url: str, *, retries: int = 4) -> Any:
+    global _LAST_COINPAPRIKA_REQUEST
+    elapsed = time.monotonic() - _LAST_COINPAPRIKA_REQUEST
+    if elapsed < COINPAPRIKA_REQUEST_INTERVAL_SECONDS:
+        time.sleep(COINPAPRIKA_REQUEST_INTERVAL_SECONDS - elapsed)
+    _LAST_COINPAPRIKA_REQUEST = time.monotonic()
+    return _http_json(url, retries=retries)
 
 
 def _record(
@@ -116,26 +129,271 @@ def _record(
     }
 
 
-def _fetch_coinpaprika() -> list[dict[str, Any]]:
-    """Fetch CoinPaprika's keyless Free ticker catalogue for personal research use."""
-    payload = _http_json("https://api.coinpaprika.com/v1/tickers")
+def _fetch_coinpaprika_top_tickers() -> list[dict[str, Any]]:
+    payload = _coinpaprika_get("https://api.coinpaprika.com/v1/tickers")
     if not isinstance(payload, list) or not payload:
-        raise MarketCapDataError("CoinPaprika tickers response was empty or malformed")
+        raise MarketCapDataError("CoinPaprika top-tickers response was empty or malformed")
     output: list[dict[str, Any]] = []
     for row in payload:
         if not isinstance(row, dict):
             continue
         quote = (row.get("quotes") or {}).get("USD") or {}
-        stamp = _iso_ms(row.get("last_updated"))
         item = _record(
             row.get("symbol"), row.get("name"), quote.get("market_cap"),
-            row.get("id"), "coinpaprika", stamp,
+            row.get("id"), "coinpaprika", _iso_ms(row.get("last_updated")),
         )
         if item:
             output.append(item)
     if not output:
-        raise MarketCapDataError("CoinPaprika returned no positive market caps")
+        raise MarketCapDataError("CoinPaprika returned no positive top-list market caps")
     return output
+
+
+def _fetch_coinpaprika_coin_catalogue() -> list[dict[str, Any]]:
+    payload = _coinpaprika_get("https://api.coinpaprika.com/v1/coins")
+    if not isinstance(payload, list) or not payload:
+        raise MarketCapDataError("CoinPaprika coin catalogue was empty or malformed")
+    return [
+        {
+            "id": str(row.get("id", "")),
+            "symbol": str(row.get("symbol", "")).strip().upper(),
+            "name": str(row.get("name", "")),
+        }
+        for row in payload
+        if isinstance(row, dict)
+        and row.get("id")
+        and str(row.get("symbol", "")).strip()
+    ]
+
+
+def _fetch_coinpaprika_single_ticker(coin_id: str) -> dict[str, Any] | None:
+    payload = _coinpaprika_get(
+        f"https://api.coinpaprika.com/v1/tickers/{coin_id}",
+        retries=0,
+    )
+    if not isinstance(payload, dict):
+        return None
+    quote = (payload.get("quotes") or {}).get("USD") or {}
+    return _record(
+        payload.get("symbol"), payload.get("name"), quote.get("market_cap"),
+        payload.get("id"), "coinpaprika", _iso_ms(payload.get("last_updated")),
+    )
+
+
+def _group_provider_rows(rows: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
+    grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in rows:
+        symbol = str(row.get("symbol", "")).upper()
+        if symbol:
+            grouped[symbol].append(row)
+    return dict(grouped)
+
+
+def _write_json_atomic(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(
+        json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n",
+        encoding="utf-8",
+    )
+    temporary.replace(path)
+
+
+def _market_cap_paths() -> tuple[Path, Path]:
+    root = Path(os.environ.get("MARKET_DATA_DIR", "../market-data"))
+    directory = root / "data" / "market_cap"
+    return directory / "provider_cache.json", directory / "daily_attempt.json"
+
+
+def _record_is_fresh(record: dict[str, Any], now_ms: int) -> bool:
+    stamp = int(record.get("source_updated_ms", 0))
+    return (
+        stamp > 0
+        and stamp <= now_ms + 300_000
+        and now_ms - stamp <= MAX_SOURCE_AGE_MS
+    )
+
+
+def _load_market_cap_records(
+    required_symbols: set[str],
+    now_ms: int,
+) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
+    """Resolve the full MEXC symbol set with CoinPaprika's keyless single-coin endpoint."""
+    cache_path, attempt_path = _market_cap_paths()
+    today = datetime.fromtimestamp(now_ms / 1000, UTC).date().isoformat()
+    required = sorted(required_symbols)
+
+    if cache_path.is_file():
+        try:
+            cached = json.loads(cache_path.read_text(encoding="utf-8"))
+            records = cached.get("records", {})
+            if (
+                cached.get("decision_date") == today
+                and cached.get("required_symbols") == required
+                and isinstance(records, dict)
+                and now_ms - int(cached.get("fetched_at_ms", 0)) <= MAX_SOURCE_AGE_MS
+                and all(_record_is_fresh(row, now_ms) for row in records.values())
+            ):
+                return records, cached["summary"]
+        except (OSError, ValueError, TypeError, json.JSONDecodeError, KeyError):
+            pass
+
+    if attempt_path.is_file():
+        try:
+            attempt = json.loads(attempt_path.read_text(encoding="utf-8"))
+            if attempt.get("decision_date") == today:
+                raise MarketCapDataError(
+                    "CoinPaprika lookup already attempted today; refusing repeated calls "
+                    "without a complete private Actions cache. "
+                    f"Previous status={attempt.get('status', 'UNKNOWN')}"
+                )
+        except MarketCapDataError:
+            raise
+        except (OSError, ValueError, TypeError, json.JSONDecodeError):
+            pass
+
+    attempt = {
+        "decision_date": today,
+        "status": "IN_PROGRESS",
+        "started_at_ms": now_ms,
+        "required_symbols": len(required),
+        "provider": "coinpaprika",
+    }
+    _write_json_atomic(attempt_path, attempt)
+
+    try:
+        top_rows = _fetch_coinpaprika_top_tickers()
+        catalogue = _fetch_coinpaprika_coin_catalogue()
+        top_groups = _group_provider_rows(top_rows)
+        catalogue_groups = _group_provider_rows(catalogue)
+
+        resolved: dict[str, dict[str, Any]] = {}
+        ambiguous: list[str] = []
+        stale: list[str] = []
+        missing: list[str] = []
+        pending: dict[str, tuple[str, str, str]] = {}
+
+        for base_symbol in required:
+            top_matches = top_groups.get(base_symbol, [])
+            if len(top_matches) > 1:
+                ambiguous.append(base_symbol)
+                continue
+            if len(top_matches) == 1 and _record_is_fresh(top_matches[0], now_ms):
+                record = dict(top_matches[0])
+                record["source_symbol"] = base_symbol
+                record["symbol_match_type"] = "exact_top_2000"
+                resolved[base_symbol] = record
+                continue
+
+            coin_matches = catalogue_groups.get(base_symbol, [])
+            match_type = "exact"
+            source_symbol = base_symbol
+            if len(coin_matches) > 1:
+                ambiguous.append(base_symbol)
+                continue
+            if not coin_matches:
+                # MEXC uses denomination-prefixed contracts for some assets.
+                # Prefer exact symbols; only strip a known multiplier prefix
+                # when the underlying CoinPaprika symbol is unique.
+                alias_matches: list[dict[str, Any]] = []
+                for prefix in ("1000000", "10000", "1000"):
+                    if base_symbol.startswith(prefix):
+                        candidate_symbol = base_symbol[len(prefix):]
+                        candidate_matches = catalogue_groups.get(candidate_symbol, [])
+                        if len(candidate_matches) == 1:
+                            alias_matches = candidate_matches
+                            source_symbol = candidate_symbol
+                            match_type = f"mexc_{prefix}x_denomination_alias"
+                            break
+                        if len(candidate_matches) > 1:
+                            break
+                if len(alias_matches) > 1:
+                    ambiguous.append(base_symbol)
+                    continue
+                if not alias_matches:
+                    missing.append(base_symbol)
+                    continue
+                coin_matches = alias_matches
+
+            coin_id = str(coin_matches[0].get("id", ""))
+            if not coin_id:
+                missing.append(base_symbol)
+                continue
+            pending[base_symbol] = (coin_id, source_symbol, match_type)
+
+        if len(pending) > COINPAPRIKA_MAX_SINGLE_LOOKUPS:
+            raise MarketCapDataError(
+                "CoinPaprika free-tier monthly-call safety cap exceeded: "
+                f"{len(pending)} individual ticker lookups requested; "
+                f"maximum is {COINPAPRIKA_MAX_SINGLE_LOOKUPS} per daily decision"
+            )
+
+        individual_calls = 0
+        request_errors: list[str] = []
+        for base_symbol, (coin_id, source_symbol, match_type) in pending.items():
+            individual_calls += 1
+            try:
+                record = _fetch_coinpaprika_single_ticker(coin_id)
+            except MarketCapDataError as exc:
+                if "HTTP 429" in str(exc):
+                    raise
+                request_errors.append(f"{base_symbol}:{str(exc)[:180]}")
+                missing.append(base_symbol)
+                continue
+            if record is None or record.get("symbol") != source_symbol:
+                missing.append(base_symbol)
+                continue
+            if not _record_is_fresh(record, now_ms):
+                stale.append(base_symbol)
+                continue
+            record["source_symbol"] = source_symbol
+            record["symbol_match_type"] = match_type
+            resolved[base_symbol] = record
+
+        coverage = {
+            "required_symbols": len(required),
+            "resolved_symbols": len(resolved),
+            "missing_symbols": sorted(set(missing)),
+            "ambiguous_symbols": sorted(set(ambiguous)),
+            "stale_symbols": sorted(set(stale)),
+        }
+        calls_used = 2 + individual_calls
+        summary = {
+            "provider": "coinpaprika",
+            "attribution": "Powered by CoinPaprika",
+            "top_ticker_rows_received": len(top_rows),
+            "coin_catalogue_rows_received": len(catalogue),
+            "individual_ticker_lookups": individual_calls,
+            "api_calls_used": calls_used,
+            "api_calls_daily_safety_cap": 642,
+            "request_errors": request_errors,
+            "coverage": coverage,
+        }
+        cache_payload = {
+            "decision_date": today,
+            "fetched_at_ms": now_ms,
+            "required_symbols": required,
+            "records": resolved,
+            "summary": summary,
+        }
+        _write_json_atomic(cache_path, cache_payload)
+        _write_json_atomic(attempt_path, {
+            **attempt,
+            "status": "COMPLETED",
+            "completed_at_ms": int(datetime.now(UTC).timestamp() * 1000),
+            "api_calls_used": calls_used,
+            "resolved_symbols": len(resolved),
+            "required_symbols": len(required),
+        })
+        return resolved, summary
+    except Exception as exc:
+        _write_json_atomic(attempt_path, {
+            **attempt,
+            "status": "FAILED",
+            "completed_at_ms": int(datetime.now(UTC).timestamp() * 1000),
+            "error": f"{type(exc).__name__}: {str(exc)[:500]}",
+        })
+        raise
 
 
 def _group_provider_rows(rows: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
