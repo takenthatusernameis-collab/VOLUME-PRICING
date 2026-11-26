@@ -36,11 +36,13 @@ Official references:
 
 ### CoinGecko Keyless Public API
 
-- It offers no-key access to market-cap data for evaluation and limited queries.
-- Its unauthenticated shared rate pool is low (about 5 calls/minute, depending on load), and its documentation says the keyless route is not suitable for scheduled production or high-frequency workloads.
-- It is not used for this five-minute Actions project.
+- It offers no-key access to market-cap data through `/coins/markets`, with up to 250 assets per page. Eight paginated requests cover the top 2,000 market-cap-ranked assets.
+- Its unauthenticated shared rate pool is currently documented as 5–15 calls/minute, depending on global load. An eight-page daily snapshot is technically feasible when paced conservatively, but can still encounter shared-pool HTTP 429 responses and has no guaranteed per-project monthly quota.
+- This makes it a viable no-auth alternative for a once-daily paper decision, not a dependable source for five-minute polling. This project currently prefers CoinPaprika's published 20,000-call monthly allowance and calls it only after the MEXC daily-history gate passes.
+- CoinGecko is not currently configured as a fallback; if CoinPaprika coverage fails its 80% gate or the free-tier asset limit, the portfolio remains blocked rather than silently switching providers or mixing stale data.
 
 Official references:
+- https://docs.coingecko.com/reference/coins-markets
 - https://docs.coingecko.com/docs/keyless-public-api
 - https://support.coingecko.com/articles/5125303456-what-is-the-rate-limit-for-coingecko-api-public-plan
 
