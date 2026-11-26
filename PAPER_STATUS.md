@@ -8,26 +8,26 @@
 - Strategy generation: `volume-to-market-cap-first-positive-negative-coinpaprika-v2`
 - Starting capital: **100.00000000 USDT**
 - Account state: **INITIALIZED — FORWARD PAPER**
-- Last report build: 2026-11-26 11:56:40 UTC
-- Latest workflow run: [45814635800](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45814635800) · run #7, attempt 1 · failure · push
+- Last report build: 2026-11-26 18:58:53 UTC
+- Latest workflow run: [45879740063](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45879740063) · run #8, attempt 1 · success · push
 - Latest processed daily candle: —
-- Latest account event: 2026-11-26 11:56:28 UTC
+- Latest account event: 2026-11-26 18:58:40 UTC
 - Primary execution journal: [PAPER_TRADE_JOURNAL.md](PAPER_TRADE_JOURNAL.md)
 
 
 ## MEXC universe and data coverage
 
 - Coverage state: **BOOTSTRAPPING**
-- Active USDT-settled cross-margin perpetuals: —
+- Active USDT-settled cross-margin perpetuals: 1087
 - Strategy-eligible crypto/unclassified contracts: 611
 - Excluded tokenized-stock suffix contracts (overlaps category counts): 446
 - Excluded non-crypto categories: {'commodity': 13, 'equity': 139, 'fx': 6}
-- MEXC tickers received: —
-- Missing tickers: —
-- History bootstrap remaining: —
-- API failures: —
-- Latest completed daily candle (UTC ms): —
-- Portfolio decision: `FAILED`
+- MEXC tickers received: 1087
+- Missing tickers: 0
+- History bootstrap remaining: 437
+- API failures: 0
+- Latest completed daily candle (UTC ms): 1795564800000
+- Portfolio decision: `BLOCKED_INCOMPLETE_MARKET_DATA`
 - Market-cap provider: coinpaprika — Powered by CoinPaprika
 - Fresh market-cap matches: —/—
 - CoinPaprika calls this daily decision: —/642
@@ -37,7 +37,6 @@
 Numerator: MEXC rolling 24-hour USDT quote turnover. Denominator: circulating market capitalization in USD.
 
 **Highest-ranked positive 24-hour change candidates (long side):**
-- Cycle error: `GitHubStateError: Published event batch is not in the verified remote chain: 1356583a33afda9e3d0571efefb4ca8d3172e78eb97619f8299dfe6a04bba6ec`
 - No eligible positive-change candidate.
 
 **Highest-ranked negative 24-hour change candidates (short side):**
@@ -69,7 +68,7 @@ Portfolio transitions remain blocked until the complete eligible MEXC USDT unive
 
 | Session start (UTC) | Starting NAV | Latest NAV | Max drawdown | Marks |
 |---|---:|---:|---:|---:|
-| 2026-11-26 00:00:00 UTC | 100.00000000 | 100.00000000 | +0.000% | 4 |
+| 2026-11-26 00:00:00 UTC | 100.00000000 | 100.00000000 | +0.000% | 5 |
 
 ## Open positions
 
