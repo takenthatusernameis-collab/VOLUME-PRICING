@@ -27,7 +27,7 @@ jobs:
     env:
       MARKET_DATA_DIR: ../market-data
       PAPER_STATE_DIR: ../state
-      BOOTSTRAP_BATCH_SIZE: "150"
+      BOOTSTRAP_BATCH_SIZE: "50"
       PYTHONUNBUFFERED: "1"
       PAPER_STATE_WRITE_ENABLED: "true"
       GITHUB_REPOSITORY: ${{ github.repository }}
