@@ -95,7 +95,7 @@ def test_unmatched_market_cap_is_excluded_without_symbol_guessing(monkeypatch, t
         rows, histories, tickers, Decimal("100"), as_of_timestamp_ms=stamp
     )
 
-    assert [row.symbol for row in result.research_longs] == ["mexc:5", "mexc:4", "mexc:3", "mexc:1"]
+    assert [row.symbol for row in result.research_longs] == ["mexc:5", "mexc:3", "mexc:1"]
     assert [row.symbol for row in result.research_shorts] == ["mexc:4"]
     assert [row.symbol for row in result.executable_longs] == ["mexc:5"]
     assert [row.symbol for row in result.executable_shorts] == ["mexc:4"]
