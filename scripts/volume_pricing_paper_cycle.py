@@ -5,6 +5,7 @@ from __future__ import annotations
 import importlib.util
 import json
 import os
+import re
 import sys
 import time
 from collections import defaultdict
@@ -424,76 +425,6 @@ def _load_market_cap_records(
             "error": f"{type(exc).__name__}: {str(exc)[:500]}",
         })
         raise
-
-
-def _group_provider_rows(rows: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
-    grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
-    for row in rows:
-        symbol = str(row.get("symbol", "")).upper()
-        if symbol:
-            grouped[symbol].append(row)
-    return dict(grouped)
-
-
-def _write_json_atomic(path: Path, payload: dict[str, Any]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_suffix(path.suffix + ".tmp")
-    temporary.write_text(
-        json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n",
-        encoding="utf-8",
-    )
-    temporary.replace(path)
-
-
-def _load_market_cap_records(
-    required_symbols: set[str],
-    now_ms: int,
-) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
-    """Fetch one fresh keyless CoinPaprika snapshot; never persist its raw catalogue."""
-    rows = _fetch_coinpaprika()
-    grouped = _group_provider_rows(rows)
-    resolved: dict[str, dict[str, Any]] = {}
-    ambiguous: list[str] = []
-    stale: list[str] = []
-    missing: list[str] = []
-    for symbol in sorted(required_symbols):
-        matches = grouped.get(symbol, [])
-        if len(matches) > 1:
-            ambiguous.append(symbol)
-            continue
-        if not matches:
-            missing.append(symbol)
-            continue
-        record = matches[0]
-        stamp = int(record.get("source_updated_ms", 0))
-        if (
-            stamp <= 0
-            or stamp > now_ms + 300_000
-            or now_ms - stamp > MAX_SOURCE_AGE_MS
-        ):
-            stale.append(symbol)
-            continue
-        resolved[symbol] = record
-
-    coverage = {
-        "required_symbols": len(required_symbols),
-        "resolved_symbols": len(resolved),
-        "missing_symbols": missing,
-        "ambiguous_symbols": ambiguous,
-        "stale_symbols": stale,
-    }
-    if not resolved:
-        raise MarketCapDataError(
-            "CoinPaprika returned no fresh, unambiguous market-cap matches"
-        )
-    # Keep only summary metadata in the public report. The full provider
-    # catalogue remains in memory and is never committed or redistributed.
-    return resolved, {
-        "provider": "coinpaprika",
-        "provider_rows_received": len(rows),
-        "attribution": "Powered by CoinPaprika",
-        "coverage": coverage,
-    }
 
 
 def _universe_history_ready(
