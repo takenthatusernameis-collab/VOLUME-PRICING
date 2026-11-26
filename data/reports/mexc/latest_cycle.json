@@ -9,13 +9,13 @@
   "paper_state_write_requested": true,
   "private_endpoints_used": false,
   "provider": "mexc",
-  "run_utc": "2026-11-26T11:07:01.742566+00:00",
+  "run_utc": "2026-11-26T11:36:57.523277+00:00",
   "state_recovery_probe": {
-    "batch_hash": "cd84d356fea75cbb9f8f1fe4c8011c6fc241046ca98b8aa3948dc239f68ab5fc",
-    "commit_sha": "0153bff8037658998c8bbfe20065619f25598378",
+    "batch_hash": "80cdbe8dcc3d744d48ddaf7451e41844818c69093b06b5b6adb85a7765b06ed1",
+    "commit_sha": "9e6d9281f31e0f7870440b4353a17133b9e31734",
     "created": true,
     "fresh_checkout_recovery_required": true,
-    "path": "events/2026/11/state-probe-1795691216793.json",
+    "path": "events/2026/11/state-probe-1795693011274.json",
     "remote_readback_verified": true
   },
   "state_write_mode": "UNPROTECTED_SINGLE_WRITER_APPEND_ONLY",

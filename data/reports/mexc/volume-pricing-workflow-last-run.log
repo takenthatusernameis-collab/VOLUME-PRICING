@@ -1,9 +1,23 @@
-[mexc-history] resolved batch size=150 for 1087 active cross-margin perpetuals (0 configuration means full universe)
-[mexc-history] selected 150 stale instruments from 1087 active contracts for daily bar 1795564800000
-[mexc-history] checkpoint 25/150; new histories bootstrapped=25; bootstrap histories remaining=1062; API failures=0
-[mexc-history] checkpoint 50/150; new histories bootstrapped=50; bootstrap histories remaining=1037; API failures=0
-[mexc-history] checkpoint 75/150; new histories bootstrapped=75; bootstrap histories remaining=1012; API failures=0
-[mexc-history] checkpoint 100/150; new histories bootstrapped=100; bootstrap histories remaining=987; API failures=0
-[mexc-history] checkpoint 125/150; new histories bootstrapped=125; bootstrap histories remaining=962; API failures=0
-[mexc-history] checkpoint 150/150; new histories bootstrapped=150; bootstrap histories remaining=937; API failures=0
-[mexc-history] batch finished: checked=150/150; new histories bootstrapped=150; bootstrap histories remaining=937; API failures=0
+{
+  "credentials_used": false,
+  "initial_capital_usdt": "100",
+  "mode": "STATE_PERSISTENCE_PROBE",
+  "orders_submitted": 0,
+  "paper_account_initialized": false,
+  "paper_decision_status": "PUBLISH_READBACK_VERIFIED_AWAITING_FRESH_CHECKOUT",
+  "paper_simulation_enabled": false,
+  "paper_state_write_requested": true,
+  "private_endpoints_used": false,
+  "provider": "mexc",
+  "run_utc": "2026-11-26T11:36:57.523277+00:00",
+  "state_recovery_probe": {
+    "batch_hash": "80cdbe8dcc3d744d48ddaf7451e41844818c69093b06b5b6adb85a7765b06ed1",
+    "commit_sha": "9e6d9281f31e0f7870440b4353a17133b9e31734",
+    "created": true,
+    "fresh_checkout_recovery_required": true,
+    "path": "events/2026/11/state-probe-1795693011274.json",
+    "remote_readback_verified": true
+  },
+  "state_write_mode": "UNPROTECTED_SINGLE_WRITER_APPEND_ONLY",
+  "wallet_used": false
+}
