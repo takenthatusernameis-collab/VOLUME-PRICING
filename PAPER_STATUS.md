@@ -1,6 +1,6 @@
-# BOOTSTRAPPING PAPER STATUS — VOLUME PRICING $100 USDT
+# ACTIVE PAPER STATUS — VOLUME PRICING $100 USDT
 
-**BOOTSTRAPPING · PAPER ONLY · NO LIVE ORDERS**
+**🟢 ACTIVE · PAPER ONLY · NO LIVE ORDERS**
 
 **Correct workflow:** [Open active workflow](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/workflows/volume-pricing-paper-cycle.yml)
 
@@ -8,8 +8,8 @@
 - Strategy generation: `volume-to-market-cap-first-positive-negative-coinpaprika-v2`
 - Starting capital: **100.00000000 USDT**
 - Account state: **INITIALIZED — FORWARD PAPER**
-- Last report build: 2026-11-26 19:24:16 UTC
-- Latest workflow run: [45883355571](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45883355571) · run #17, attempt 1 · skipped · push
+- Last report build: 2026-11-26 19:27:18 UTC
+- Latest workflow run: [45883496351](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45883496351) · run #18, attempt 1 · failure · push
 - Latest processed daily candle: —
 - Latest account event: 2026-11-26 19:12:20 UTC
 - Primary execution journal: [PAPER_TRADE_JOURNAL.md](PAPER_TRADE_JOURNAL.md)
@@ -17,27 +17,27 @@
 
 ## MEXC universe and data coverage
 
-- Coverage state: **BOOTSTRAPPING**
-- Active USDT-settled cross-margin perpetuals: —
+- Coverage state: **READY**
+- Active USDT-settled cross-margin perpetuals: 1087
 - Strategy-eligible crypto/unclassified contracts: 611
 - Excluded tokenized-stock suffix contracts (overlaps category counts): 446
 - Excluded non-crypto categories: {'commodity': 13, 'equity': 139, 'fx': 6}
 - MEXC tickers received: —
 - Missing tickers: —
-- History bootstrap remaining: —
-- API failures: —
+- History bootstrap remaining: 0
+- API failures: 0
 - Latest completed daily candle (UTC ms): —
 - Portfolio decision: `FAILED`
-- Market-cap provider: coinpaprika — Powered by CoinPaprika
-- Fresh market-cap matches: 460/611
-- Market-cap API calls: CoinPaprika —/642; CoinGecko —/8
+- Market-cap provider: coinpaprika+coingecko — Powered by CoinPaprika; Powered by CoinGecko
+- Fresh market-cap matches: 514/611
+- Market-cap API calls: CoinPaprika 13/642; CoinGecko 8/8
 
 ### Volume-to-market-cap ranking
 
 Numerator: MEXC rolling 24-hour USDT quote turnover. Denominator: circulating market capitalization in USD.
 
 **Highest-ranked positive 24-hour change candidates (long side):**
-- Cycle error: `MarketCapDataError: Fresh, unambiguous market-cap coverage is below the 80% safety gate: 460/611 symbols`
+- Cycle error: `EventJournalError: Binary float is not allowed in durable events: event.payload.details.research_long_top[0].completed_daily_close`
 - No eligible positive-change candidate.
 
 **Highest-ranked negative 24-hour change candidates (short side):**
