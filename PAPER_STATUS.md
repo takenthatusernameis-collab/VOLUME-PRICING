@@ -1,6 +1,6 @@
-# EXECUTION BLOCKED — PAPER ONLY — VOLUME PRICING $100 USDT
+# ACTIVE PAPER STATUS — VOLUME PRICING $100 USDT
 
-**EXECUTION BLOCKED · PAPER ONLY · NO LIVE ORDERS**
+**🟢 ACTIVE · PAPER ONLY · NO LIVE ORDERS**
 
 **Correct workflow:** [Open active workflow](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/workflows/volume-pricing-paper-cycle.yml)
 
@@ -8,26 +8,26 @@
 - Strategy generation: `volume-to-market-cap-first-positive-negative-coinpaprika-v2`
 - Starting capital: **100.00000000 USDT**
 - Account state: **INITIALIZED — FORWARD PAPER**
-- Last report build: 2026-11-26 20:08:31 UTC
-- Latest workflow run: [45888734390](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45888734390) · run #24, attempt 1 · failure · workflow_dispatch
+- Last report build: 2026-11-26 20:09:30 UTC
+- Latest workflow run: [45888841695](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45888841695) · run #26, attempt 1 · success · schedule
 - Latest processed daily candle: 2026-11-25 00:00 UTC
-- Latest account event: 2026-11-26 20:08:10 UTC
+- Latest account event: 2026-11-26 20:09:08 UTC
 - Primary execution journal: [PAPER_TRADE_JOURNAL.md](PAPER_TRADE_JOURNAL.md)
 
 
 ## MEXC universe and data coverage
 
-- Coverage state: **EXECUTION_BLOCKED**
+- Coverage state: **READY**
 - Active USDT-settled cross-margin perpetuals: not refreshed in snapshot mode
 - Strategy-eligible crypto/unclassified contracts: —
 - Excluded tokenized-stock suffix contracts (overlaps category counts): —
 - Excluded non-crypto categories: {}
 - MEXC tickers received: 0
-- Missing tickers: 0
+- Missing tickers: 2
 - History bootstrap remaining: not refreshed in snapshot mode
 - API failures: 0
 - Latest completed daily candle (UTC ms): 1795564800000
-- Portfolio decision: `RETRY_EXECUTION_BLOCKED`
+- Portfolio decision: `RETRY_PAIR_REBUILT`
 - Market-cap provider: coinpaprika+coingecko — Powered by CoinPaprika; Powered by CoinGecko
 - Fresh market-cap matches: 514/611
 - Market-cap API calls: CoinPaprika 13/642; CoinGecko 8/8
@@ -37,8 +37,7 @@
 Numerator: MEXC rolling 24-hour USDT quote turnover. Denominator: circulating market capitalization in USD.
 
 **Highest-ranked positive 24-hour change candidates (long side):**
-- Pending pair retry: \`RETRY_EXECUTION_BLOCKED\` (attempt 4)
-- Execution check: MEXCExecutionUnavailable: No candidate pair passed independent NAV sizing and public-depth checks; 1 fill attempt(s) failed; last failure: BULLA_USDT: ExecutionImpactExceeded: Modeled shortfall 30.68595840480916327624248200 bp
+- Pending pair retry: \`RETRY_PAIR_REBUILT\` (attempt 5)
 - ANTHROPIC_USDT: ratio=786.9282990471105548999670127%, MEXC 24h change=0.0045, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
 - LAB_USDT: ratio=41.58089691685163016614432339%, MEXC 24h change=0.0105, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
 - INIT_USDT: ratio=41.17441566171532285569618224%, MEXC 24h change=0.0344, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
@@ -62,21 +61,21 @@ Numerator: MEXC rolling 24-hour USDT quote turnover. Denominator: circulating ma
 - SSV_USDT: ratio=14.88356978307003717811781508%, MEXC 24h change=-0.0043, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
 - LISTA_USDT: ratio=13.98481304357618542012252427%, MEXC 24h change=-0.0058, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
 
-The daily ranking and selected pair remain frozen for this UTC candle. Five-minute snapshots retry the same pair against fresh public order-book depth; no lower-ranked substitute is opened.
+The daily ranking is frozen for this UTC candle. Five-minute runs update paper NAV, funding, risk and any pending-entry retry. No live orders are submitted.
 
 ## Current performance
 
 | Metric | Value |
 |---|---:|
 | Initial capital | 100.00000000 USDT |
-| **NAV** | **100.00000000 USDT** |
-| Total return | +0.000% |
-| Cash | 100.00000000 USDT |
-| Unrealized P&L | +0.00000000 USDT |
-| Fees paid | 0.00000000 USDT |
+| **NAV** | **99.72424180 USDT** |
+| Total return | -0.276% |
+| Cash | 99.98010180 USDT |
+| Unrealized P&L | -0.25586000 USDT |
+| Fees paid | 0.01989820 USDT |
 | Confirmed funding | +0.00000000 USDT |
-| Gross exposure | 0.000× NAV |
-| Net exposure | 0.000× NAV |
+| Gross exposure | 2.003× NAV |
+| Net exposure | 0.003× NAV |
 | Current drawdown from risk-window peak | +0.000% |
 | Lifetime / cross-session maximum drawdown | +0.000% |
 | Worst risk-session maximum drawdown | +0.000% |
@@ -94,7 +93,8 @@ The daily ranking and selected pair remain frozen for this UTC candle. Five-minu
 
 | Symbol | Side | Quantity | Entry price | Mark | Notional (USDT) |
 |---|---|---:|---:|---:|---:|
-| No open positions yet | — | — | — | — | — |
+| ANTHROPIC_USDT | long | 1.186 | 84.32 | 84.31 | 99.991660 |
+| BULLA_USDT | short | 3050 | 0.03262 | 0.0327 | 99.735000 |
 
 ## Primary path — equal exposure
 
@@ -108,10 +108,10 @@ This chart is a **visual-only counterfactual**, not an executed account. It reus
 
 At each rebalance, the quieter leg receives the larger share using inverse 30-completed-day realized volatility. The leverage overlay is the ratio of equal-exposure pair volatility to the inverse-volatility pair’s base estimated volatility. It increases modeled gross exposure only when the alternative has lower estimated volatility. Estimates use only data available at that rebalance.
 
-- Latest long / short allocation: **50.0% / 50.0%** of alternative gross notional.
-- Latest volatility-matching leverage multiplier: **1.000×**.
-- Estimated base volatility reduction before leverage: **+0.00%**.
-- Volatility observations used: **0**; status: `AWAITING_FIRST_PAIR`.
+- Latest long / short allocation: **86.3% / 13.7%** of alternative gross notional.
+- Latest volatility-matching leverage multiplier: **2.875×**.
+- Estimated base volatility reduction before leverage: **+65.21%**.
+- Volatility observations used: **30**; status: `RISK_MATCHED_INVERSE_VOLATILITY`.
 
 ![Inverse-volatility alternative equity curve](alternative_path_equity_curve.svg)
 

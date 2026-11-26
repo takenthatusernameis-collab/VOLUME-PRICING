@@ -5,12 +5,13 @@
 - Account: `mexc-usdt-forward-volume-pricing-coinpaprika-100usdt-v2`
 - Strategy generation: `volume-to-market-cap-first-positive-negative-coinpaprika-v2`
 - Starting capital: **100.00000000 USDT**
-- Generated: 2026-11-26 20:08:31 UTC
-- Latest workflow: [45888734390](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45888734390)
-- Recorded primary events: **0**
+- Generated: 2026-11-26 20:09:30 UTC
+- Latest workflow: [45888841695](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45888841695)
+- Recorded primary events: **2**
 
 | Timestamp (UTC) | Symbol | Side | Action | Quantity | Price | Fee (USDT) | Realized net P&L (USDT) | Funding (USDT) | Event ID |
 |---|---|---|---|---:|---:|---:|---:|---:|---|
-| No primary fills or funding events recorded yet | — | — | — | — | — | — | — | — | — |
+| 2026-11-26 20:09:16 UTC | ANTHROPIC_USDT | long | OPENED | 1.186 | 84.32 | 0.00000 | — | — | `paper_entry_retry-snapshot-1795723748235` |
+| 2026-11-26 20:09:16 UTC | BULLA_USDT | short | OPENED | 3050 | 0.03262 | 0.019898200 | — | — | `paper_entry_retry-snapshot-1795723748235` |
 
 This journal covers only the primary paper account. The inverse-volatility alternative path has no separate trade journal, positions or event stream.
