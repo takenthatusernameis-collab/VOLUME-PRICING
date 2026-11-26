@@ -6,7 +6,7 @@ A paper-only, market-neutral cross-sectional strategy that ranks every eligible 
 
 At each newly completed UTC daily candle, after the full eligible universe has current data:
 
-1. Discover every active MEXC cross-margin USDT-settled perpetual.
+1. Discover active MEXC cross-margin USDT-settled perpetuals; retain all `crypto` and `unclassified` contracts, excluding tokenized-stock suffixes and contracts categorized as equity, commodity or FX because those lack a comparable crypto circulating-market-cap denominator.
 2. Calculate `MEXC 24h USDT turnover / external circulating market cap (USD)`.
 3. Sort all assets in descending order of that ratio.
 4. Traverse the same ranking to select the first asset with positive MEXC 24-hour price change as the long and the first asset with negative 24-hour price change as the short.
