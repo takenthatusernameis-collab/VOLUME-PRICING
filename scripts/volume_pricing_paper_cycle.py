@@ -544,10 +544,15 @@ def rank_volume_pricing_universe(
     eligible = [
         row for row in all_usdt
         if str(row.get("category", "unknown")).lower() in {"crypto", "unclassified"}
+        and not str(row.get("base_asset", "")).strip().upper().endswith("STOCK")
     ]
     _STRATEGY_UNIVERSE_SUMMARY = {
         "all_usdt_perpetuals": len(all_usdt),
         "eligible_crypto_and_unclassified": len(eligible),
+        "excluded_stock_suffix_contracts": sum(
+            str(row.get("base_asset", "")).strip().upper().endswith("STOCK")
+            for row in all_usdt
+        ),
         "excluded_by_category": {
             key: value for key, value in sorted(category_counts.items())
             if key not in {"crypto", "unclassified"}
