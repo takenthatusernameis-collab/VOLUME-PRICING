@@ -888,7 +888,7 @@ def _ranking_report_rows(
             "market_cap_symbol_match_type": str(instrument["market_cap_symbol_match_type"]),
             "market_cap_source_updated_ms": int(instrument["market_cap_source_updated_ms"]),
             "mexc_change_24h": str(instrument["mexc_change_24h"]),
-            "completed_daily_close": candidate.close_price,
+            "completed_daily_close": str(candidate.close_price),
             "decision_bar_timestamp_ms": candidate.decision_timestamp_ms,
         })
     return rows
