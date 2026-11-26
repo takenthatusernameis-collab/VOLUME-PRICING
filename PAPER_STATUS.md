@@ -8,10 +8,10 @@
 - Strategy generation: `volume-to-market-cap-first-positive-negative-coinpaprika-v2`
 - Starting capital: **100.00000000 USDT**
 - Account state: **INITIALIZED — FORWARD PAPER**
-- Last report build: 2026-11-26 11:40:46 UTC
-- Latest workflow run: [45812294172](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45812294172) · run #4, attempt 1 · success · push
+- Last report build: 2026-11-26 11:45:34 UTC
+- Latest workflow run: [45812977601](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45812977601) · run #5, attempt 1 · success · push
 - Latest processed daily candle: —
-- Latest account event: 2026-11-26 11:40:36 UTC
+- Latest account event: 2026-11-26 11:45:22 UTC
 - Primary execution journal: [PAPER_TRADE_JOURNAL.md](PAPER_TRADE_JOURNAL.md)
 
 
@@ -19,12 +19,12 @@
 
 - Coverage state: **BOOTSTRAPPING**
 - Active USDT-settled cross-margin perpetuals: 1087
-- Strategy-eligible crypto/unclassified contracts: —
-- Excluded tokenized-stock suffix contracts: —
-- Excluded non-crypto categories: {}
+- Strategy-eligible crypto/unclassified contracts: 611
+- Excluded tokenized-stock suffix contracts (overlaps category counts): 446
+- Excluded non-crypto categories: {'commodity': 13, 'equity': 139, 'fx': 6}
 - MEXC tickers received: 1087
 - Missing tickers: 0
-- History bootstrap remaining: 837
+- History bootstrap remaining: 737
 - API failures: 0
 - Latest completed daily candle (UTC ms): 1795564800000
 - Portfolio decision: `BLOCKED_INCOMPLETE_MARKET_DATA`
@@ -68,7 +68,7 @@ Portfolio transitions remain blocked until the complete eligible MEXC USDT unive
 
 | Session start (UTC) | Starting NAV | Latest NAV | Max drawdown | Marks |
 |---|---:|---:|---:|---:|
-| 2026-11-26 00:00:00 UTC | 100.00000000 | 100.00000000 | +0.000% | 1 |
+| 2026-11-26 00:00:00 UTC | 100.00000000 | 100.00000000 | +0.000% | 2 |
 
 ## Open positions
 
@@ -105,7 +105,7 @@ The daily-candle watermark is not advanced by this report. Only the paper workfl
 
 ## Historical separation
 
-The v3 $50 USDT generation and its preliminary snapshots are archived and excluded from this account’s NAV, returns, equity curves and metrics. The immutable event ledger remains intact.
+The initial provider-validation attempt is isolated from this CoinPaprika-only v2 account. The current immutable paper ledger is on the state-coinpaprika-v2 branch.
 
 ## Alternative-path reconstruction notes
 
