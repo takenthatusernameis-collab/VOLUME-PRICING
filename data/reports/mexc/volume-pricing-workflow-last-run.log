@@ -1,10 +1,10 @@
 [mexc-history] resolved batch size=100 for 1087 active cross-margin perpetuals (0 configuration means full universe)
 [mexc-history] selected 100 stale instruments from 1087 active contracts for daily bar 1795564800000
-[mexc-history] checkpoint 25/100; new histories bootstrapped=25; bootstrap histories remaining=312; API failures=0
-[mexc-history] checkpoint 50/100; new histories bootstrapped=50; bootstrap histories remaining=287; API failures=0
-[mexc-history] checkpoint 75/100; new histories bootstrapped=75; bootstrap histories remaining=262; API failures=0
-[mexc-history] checkpoint 100/100; new histories bootstrapped=100; bootstrap histories remaining=237; API failures=0
-[mexc-history] batch finished: checked=100/100; new histories bootstrapped=100; bootstrap histories remaining=237; API failures=0
+[mexc-history] checkpoint 25/100; new histories bootstrapped=25; bootstrap histories remaining=212; API failures=0
+[mexc-history] checkpoint 50/100; new histories bootstrapped=50; bootstrap histories remaining=187; API failures=0
+[mexc-history] checkpoint 75/100; new histories bootstrapped=75; bootstrap histories remaining=162; API failures=0
+[mexc-history] checkpoint 100/100; new histories bootstrapped=100; bootstrap histories remaining=137; API failures=0
+[mexc-history] batch finished: checked=100/100; new histories bootstrapped=100; bootstrap histories remaining=137; API failures=0
 {
   "account_id": "mexc-usdt-forward-volume-pricing-coinpaprika-100usdt-v2",
   "active_cross_margin_perpetual_count": 1087,
@@ -22,8 +22,8 @@
     "unclassified": 200
   },
   "bootstrap_completed_this_run": 100,
-  "bootstrap_remaining": 237,
-  "candle_rows_stored": 291942,
+  "bootstrap_remaining": 137,
+  "candle_rows_stored": 296363,
   "credentials_used": false,
   "daily_decision_due": true,
   "daily_refresh_complete": false,
@@ -51,11 +51,11 @@
     "contracts_with_minimum_notional_above_1_usdt": 278,
     "evaluated_contracts": 1087,
     "minimum_order_notional_usdt": {
-      "maximum": "99.1700",
-      "median": "0.2722",
+      "maximum": "99.1900",
+      "median": "0.27205",
       "p10": "0.03019",
-      "p75": "1.05100",
-      "p90": "2.7102"
+      "p75": "1.04900",
+      "p90": "2.7099"
     },
     "scope_note": "Minimum quantity and lot-step affordability only; turnover, book depth, fees and shortfall remain separate execution gates.",
     "status": "MEASURED_FROM_CURRENT_PUBLIC_TICKERS"
@@ -230,6 +230,25 @@
         "short_notional_usdt": "0",
         "timestamp_ms": 1795719939168,
         "utc_date": "2026-11-26"
+      },
+      {
+        "daily_drawdown_pct": "0",
+        "daily_peak_nav": "100",
+        "daily_return_pct": "0",
+        "daily_starting_nav": "100",
+        "daily_starting_reference": "first_observation_of_utc_day",
+        "drawdown_window_reference": "first_observation_of_utc_day",
+        "drawdown_window_starting_nav": "100",
+        "emergency_stop_flattened": false,
+        "emergency_stop_newly_triggered": false,
+        "emergency_stop_triggered": false,
+        "gross_exposure": "0",
+        "long_notional_usdt": "0",
+        "nav": "100",
+        "roi_pct": "0",
+        "short_notional_usdt": "0",
+        "timestamp_ms": 1795720139855,
+        "utc_date": "2026-11-26"
       }
     ],
     "fees_paid": "0",
@@ -261,13 +280,13 @@
   "research_long_top": [],
   "research_refresh_performed": true,
   "research_short_top": [],
-  "run_utc": "2026-11-26T19:05:51.549717+00:00",
+  "run_utc": "2026-11-26T19:09:10.904413+00:00",
   "snapshot_partition": "../market-data/data/snapshots/2026-11-26/19.jsonl.gz",
   "state_event": {
-    "batch_hash": "63c1777bca64a23e2f5fc944c49c5867a0f961037f663c35a8876d59a41a5373",
-    "commit_sha": "9bd556544cb9f31678ab035d311c95c719cd5029",
+    "batch_hash": "d90bf8afd11aac5a6e12e411cd462c5a8fc350bd4bf6c60a501fd98dd836a3b5",
+    "commit_sha": "9a6a3e38c47f17b5f9a7e2319cfd9d7303bb8575",
     "created": true,
-    "path": "events/2026/11/risk-1795719939168.json"
+    "path": "events/2026/11/risk-1795720139855.json"
   },
   "state_recovery_probe_verified_from_prior_checkout": true,
   "state_write_mode": "UNPROTECTED_SINGLE_WRITER_APPEND_ONLY",

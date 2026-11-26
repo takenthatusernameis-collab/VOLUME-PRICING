@@ -1,5 +1,5 @@
 {
-  "last_run_utc": "2026-11-26T19:05:39.168000+00:00",
+  "last_run_utc": "2026-11-26T19:08:59.855000+00:00",
   "portfolio_state": {
     "account_id": "mexc-usdt-forward-volume-pricing-coinpaprika-100usdt-v2",
     "cash": "100",
@@ -155,12 +155,31 @@
         "short_notional_usdt": "0",
         "timestamp_ms": 1795719939168,
         "utc_date": "2026-11-26"
+      },
+      {
+        "daily_drawdown_pct": "0",
+        "daily_peak_nav": "100",
+        "daily_return_pct": "0",
+        "daily_starting_nav": "100",
+        "daily_starting_reference": "first_observation_of_utc_day",
+        "drawdown_window_reference": "first_observation_of_utc_day",
+        "drawdown_window_starting_nav": "100",
+        "emergency_stop_flattened": false,
+        "emergency_stop_newly_triggered": false,
+        "emergency_stop_triggered": false,
+        "gross_exposure": "0",
+        "long_notional_usdt": "0",
+        "nav": "100",
+        "roi_pct": "0",
+        "short_notional_usdt": "0",
+        "timestamp_ms": 1795720139855,
+        "utc_date": "2026-11-26"
       }
     ],
     "fees_paid": "0",
     "initial_capital": "100",
     "last_processed_daily_bar_ms": null,
-    "last_snapshot_ms": 1795719939168,
+    "last_snapshot_ms": 1795720139855,
     "partial_realized_net_pnls": [],
     "positions": [],
     "realized_gross_pnl": "0",
@@ -171,9 +190,9 @@
   },
   "schema_version": 1,
   "state_event": {
-    "batch_hash": "63c1777bca64a23e2f5fc944c49c5867a0f961037f663c35a8876d59a41a5373",
-    "commit_sha": "9bd556544cb9f31678ab035d311c95c719cd5029",
+    "batch_hash": "d90bf8afd11aac5a6e12e411cd462c5a8fc350bd4bf6c60a501fd98dd836a3b5",
+    "commit_sha": "9a6a3e38c47f17b5f9a7e2319cfd9d7303bb8575",
     "created": true,
-    "path": "events/2026/11/risk-1795719939168.json"
+    "path": "events/2026/11/risk-1795720139855.json"
   }
 }
