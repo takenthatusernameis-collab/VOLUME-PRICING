@@ -26,11 +26,9 @@ from high_vs_low.mexc_paper import Candidate, MEXCRankings
 ACCOUNT_ID = "mexc-usdt-forward-volume-pricing-100usdt-v1"
 STRATEGY_ID = "volume-to-market-cap-first-positive-negative-v1"
 INITIAL_CAPITAL = Decimal("100")
-CACHE_TTL_MS = 6 * 60 * 60 * 1000
-MAX_SOURCE_AGE_MS = 24 * 60 * 60 * 1000
+MAX_SOURCE_AGE_MS = 6 * 60 * 60 * 1000
 MAX_TICKER_SPREAD_MS = 5 * 60 * 1000
 _PENDING_DECISION_SNAPSHOT: dict[str, Any] | None = None
-DAY_MS = 86_400_000
 USER_AGENT = "volume-pricing-forward-paper/1.0"
 
 
