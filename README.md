@@ -12,7 +12,7 @@ At each newly completed UTC daily candle, after the full eligible universe has c
 4. Traverse the same ranking to select the first asset with positive MEXC 24-hour price change as the long and the first asset with negative 24-hour price change as the short.
 5. If either side is unavailable or either selected contract fails paper execution checks, do not silently substitute a lower-ranked asset. Report the blocked decision.
 
-The market-cap source is keyless CoinMarketCap first, with keyless CoinPaprika and CoinLore coverage fallbacks. CoinGecko's keyless endpoint is documented but is deliberately not used for scheduled production-like polling because its shared unauthenticated rate pool is only approximately 5 calls/minute and its own documentation says it is not suitable for scheduled production workloads.
+The scheduled market-cap source is CoinPaprika's keyless Free API: no account, key or card, 20,000 calls/month and up to 2,000 assets. Its Free licence is personal-use only, so the workflow does not persist or publish the raw provider catalogue or absolute market-cap values; it stores the strategy's derived ratios, source attribution and timestamps. CoinMarketCap Keyless is no-auth but documented for prototyping and one-off evaluation, not scheduled production; CoinLore's site terms prohibit automated bots/data mining; CoinGecko Keyless is rate-limited and not suitable for scheduled production; CoinCap v3 requires an API key.
 
 ## Two independent performance paths
 
@@ -45,4 +45,4 @@ The first workflow run bootstraps public MEXC history and verifies the append-on
 
 ## Attribution
 
-CoinMarketCap, CoinPaprika and CoinLore data-source references are recorded in each market-cap snapshot and in `docs/DATA_SOURCES.md`. CoinPaprika keyless data requires a Powered by CoinPaprika attribution and is licensed for personal use only. CoinGecko attribution is required if its keyless endpoints are used; this implementation does not use them.
+CoinPaprika attribution is included in the status and strategy documentation. The Free API is for personal use; the workflow stores derived strategy metrics rather than the raw 2,000-asset catalogue or absolute provider market-cap values.
