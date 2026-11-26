@@ -203,3 +203,43 @@ def test_market_cap_api_is_deferred_until_full_mexc_history_coverage(monkeypatch
     assert result.executable_longs == []
     assert result.executable_shorts == []
     assert result.excluded[0].startswith("BOOTSTRAP_INCOMPLETE")
+
+
+def test_state_verification_retries_only_eventual_consistency(monkeypatch):
+    calls = {"verify": 0, "sleep": []}
+
+    def verify():
+        calls["verify"] += 1
+        if calls["verify"] < 3:
+            raise RuntimeError(
+                "Published event batch is not in the verified remote chain: pending"
+            )
+        return "verified"
+
+    result = strategy._verify_remote_with_consistency_retries(
+        verify, sleep=lambda delay: calls["sleep"].append(delay)
+    )
+
+    assert result == "verified"
+    assert calls["verify"] == 3
+    assert calls["sleep"] == [1, 2]
+
+
+def test_state_verification_does_not_retry_integrity_errors():
+    calls = {"verify": 0, "sleep": []}
+
+    def verify():
+        calls["verify"] += 1
+        raise RuntimeError("State event chain forks after batch abc")
+
+    try:
+        strategy._verify_remote_with_consistency_retries(
+            verify, sleep=lambda delay: calls["sleep"].append(delay)
+        )
+    except RuntimeError as exc:
+        assert "forks" in str(exc)
+    else:
+        raise AssertionError("Permanent integrity errors must fail immediately")
+
+    assert calls["verify"] == 1
+    assert calls["sleep"] == []
