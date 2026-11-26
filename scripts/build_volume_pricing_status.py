@@ -90,6 +90,8 @@ if coverage_path.is_file():
         f"- API failures: {coverage.get('api_failure_count', '—')}",
         f"- Latest completed daily candle (UTC ms): {coverage.get('latest_completed_daily_bar_ms', '—')}",
         f"- Portfolio decision: `{coverage.get('paper_decision_status', 'UNKNOWN')}`",
+        f"- Market-cap provider: {((coverage.get('market_cap_source_summary') or {}).get('provider', 'coinpaprika'))} — Powered by CoinPaprika",
+        f"- Fresh market-cap matches: {((coverage.get('market_cap_source_summary') or {}).get('coverage', {}).get('resolved_symbols', '—'))}/{((coverage.get('market_cap_source_summary') or {}).get('coverage', {}).get('required_symbols', '—'))}",
         "",
         "### Volume-to-market-cap ranking",
         "",
