@@ -6,12 +6,12 @@ Last checked: 2026-11-26. The strategy needs circulating market capitalization i
 
 - No API key, account, registration or payment card.
 - Free tier: 20,000 calls/month per IP and a stated 2,000-asset data limit. The bulk ticker catalogue returns up to 2,000 assets.
-- The public coin catalogue lists more than 11,000 active assets, and the API documents a single-coin ticker endpoint, GET /v1/tickers/{coin_id}. The workflow uses that endpoint for MEXC symbols outside the bulk list, but the free plan's 2,000-asset entitlement may restrict out-of-list access. The first individual lookup is therefore fail-fast: if the endpoint returns 402/403, the cycle stops immediately without consuming the remaining lookup budget. Actual out-of-list free-tier coverage remains to be verified by the first full-universe run.
+- The public coin catalogue lists more than 11,000 active assets, and the API documents a single-coin ticker endpoint, GET /v1/tickers/{coin_id}. The workflow uses that endpoint for MEXC symbols outside the bulk list, but the free plan's 2,000-asset entitlement may restrict out-of-list access. If an individual lookup returns 402/403, the workflow stops further CoinPaprika individual lookups and relies on CoinGecko's bulk supplement; the 80% coverage gate still decides whether a portfolio transition is allowed. Actual out-of-list free-tier coverage is measured rather than assumed.
 - Resolution order: CoinPaprika's bulk top-2,000 ticker list first; CoinGecko's independent top-2,000 market-cap list second; then CoinPaprika's full coin catalogue and individual ticker endpoint for remaining unique IDs.
 - CoinPaprika rate limit: 10 requests/second. Individual lookups are paced at no more than approximately 8 requests/second.
 - CoinPaprika monthly quota guard: at most 640 individual ticker lookups plus two catalogue calls per daily decision. This is at most 642 calls/day, or 19,902 calls in a 31-day month. If more lookups are needed, the strategy fails closed rather than exceeding the free-tier budget.
 - CoinGecko supplement: eight `/coins/markets` pages at 250 assets each, covering the top 2,000 by market cap. Requests are paced 12.5 seconds apart (under five calls/minute) and run only at a daily portfolio decision, never on five-minute snapshots. The public pool can still return HTTP 429; that source is then marked unavailable and the coverage gate determines whether CoinPaprika alone is sufficient. This quota guard does not override the separate 2,000-asset entitlement.
-- Free licence is for personal use, side projects, learning and prototypes, not commercial products. Bulk redistribution of raw API data requires written permission, and a "Powered by CoinPaprika" attribution is required.
+- CoinPaprika Free licence is for personal use, side projects, learning and prototypes, not commercial products. Bulk redistribution of raw API data requires written permission, and a "Powered by CoinPaprika" attribution is required. When CoinGecko records are used, the status also carries "Powered by CoinGecko" attribution.
 - This is a personal paper-research workflow. Raw provider catalogues and absolute market-cap values are kept in memory and in a private GitHub Actions cache only. They are not committed to the public repository or uploaded as workflow artifacts. Public artifacts contain derived volume/market-cap ratios, MEXC turnover, provider attribution and source timestamps, not a bulk copy of either provider's data.
 - Provider lookups are deferred until all eligible MEXC histories and current tickers pass the bootstrap gate. They run for the daily decision, never on five-minute mark snapshots. A versioned private cache and versioned daily-attempt latch prevent repeated calls on retry runs.
 
@@ -34,18 +34,6 @@ Official references:
 - https://coinmarketcap.com/api/keyless/
 - https://coinmarketcap.com/api/faq/
 - https://coinmarketcap.com/api/documentation/pro-api-reference/keyless-public-api/
-
-### CoinGecko Keyless Public API
-
-- It offers no-key access to market-cap data through `/coins/markets`, with up to 250 assets per page. Eight paginated requests cover the top 2,000 market-cap-ranked assets.
-- Its unauthenticated shared rate pool is currently documented as 5–15 calls/minute, depending on global load. The workflow paces requests 12.5 seconds apart and uses this source as a supplemental catalogue once per daily decision.
-- CoinGecko is used only for symbols not resolved by CoinPaprika's bulk ticker list. Exact unique symbol matches are required; duplicate symbols remain ambiguous. A stale or unavailable CoinGecko response does not lower the 80% coverage threshold.
-- This is a low-frequency personal paper-research use, not five-minute polling. If CoinGecko returns HTTP 429 or is otherwise unavailable, the workflow may proceed with CoinPaprika-only data only if the existing coverage gate still passes.
-
-Official references:
-- https://docs.coingecko.com/reference/coins-markets
-- https://docs.coingecko.com/docs/keyless-public-api
-- https://support.coingecko.com/articles/5125303456-what-is-the-rate-limit-for-coingecko-api-public-plan
 
 ### CoinLore
 
