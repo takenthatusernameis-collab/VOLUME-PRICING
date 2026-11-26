@@ -58,7 +58,7 @@ jobs:
       - name: Check out immutable paper-state branch
         uses: actions/checkout@v4
         with:
-          ref: state
+          ref: state-coinpaprika-v2
           path: state
           fetch-depth: 0
 
@@ -110,7 +110,7 @@ jobs:
         working-directory: state
         shell: bash
         run: |
-          git fetch origin state
+          git fetch origin state-coinpaprika-v2
           git reset --hard FETCH_HEAD
 
       - name: Build primary status and inverse-volatility alternative equity curve
