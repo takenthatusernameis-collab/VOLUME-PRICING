@@ -189,7 +189,7 @@ jobs:
           name: volume-pricing-mexc-100usdt-paper-status
           path: |
             market-data/data/reports/mexc/
-            market-data/data/market_cap/
+            market-data/data/market_cap/daily_attempt.json
             strategy/PAPER_STATUS.md
             strategy/PAPER_TRADE_JOURNAL.md
             strategy/equal_exposure_equity_curve.svg
