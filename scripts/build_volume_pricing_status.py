@@ -99,6 +99,8 @@ if coverage_path.is_file():
         "",
         "**Highest-ranked positive 24-hour change candidates (long side):**",
     ])
+    if coverage.get("cycle_exception"):
+        coverage_note += f"\n- Cycle error: `{coverage.get('cycle_exception')}`"
     long_preview = coverage.get("research_long_top", [])[:10]
     if long_preview:
         coverage_note += "\n" + "\n".join(
