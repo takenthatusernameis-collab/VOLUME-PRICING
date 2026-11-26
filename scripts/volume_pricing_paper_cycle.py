@@ -466,6 +466,54 @@ def _load_market_cap_records(
     }
 
 
+def _universe_history_ready(
+    eligible: list[dict[str, Any]],
+    histories: dict[int, list[dict[str, Any]]],
+    tickers: dict[int, dict[str, Any]],
+    as_of_timestamp_ms: int,
+) -> bool:
+    """Avoid expensive provider lookups until the complete MEXC universe is ready."""
+    market_data = Path(os.environ.get("MARKET_DATA_DIR", "../market-data"))
+    manifest_path = market_data / "data" / "manifest.json"
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError, json.JSONDecodeError):
+        return False
+    records = manifest.get("instruments", {})
+    ticker_stamps = [
+        int(row.get("timestamp_ms", 0))
+        for row in tickers.values()
+        if int(row.get("timestamp_ms", 0)) > 0
+    ]
+    newest_ticker_ms = max(ticker_stamps, default=0)
+    if newest_ticker_ms <= 0:
+        return False
+
+    for instrument in eligible:
+        iid = int(instrument["instrument_id"])
+        record = records.get(str(iid), {})
+        if not record or not record.get("bootstrap_complete"):
+            return False
+        if int(record.get("last_checked_daily_bar_ms", 0)) < as_of_timestamp_ms:
+            return False
+        if record.get("last_bootstrap_error"):
+            return False
+        ticker = tickers.get(iid)
+        if ticker is None:
+            return False
+        ticker_stamp = int(ticker.get("timestamp_ms", 0))
+        if ticker_stamp <= 0 or newest_ticker_ms - ticker_stamp > MAX_TICKER_SPREAD_MS:
+            return False
+        if record.get("history_status") == "AVAILABLE":
+            daily_rows = histories.get(iid, [])
+            if not any(
+                int(row.get("timestamp_ms", 0)) == as_of_timestamp_ms
+                for row in daily_rows
+            ):
+                return False
+    return True
+
+
 def rank_volume_pricing_universe(
     instruments: list[dict[str, Any]],
     histories: dict[int, list[dict[str, Any]]],
@@ -492,6 +540,17 @@ def rank_volume_pricing_universe(
         for row in eligible if str(row.get("base_asset", "")).strip()
     }
     now_ms = int(datetime.now(UTC).timestamp() * 1000)
+    if not _universe_history_ready(eligible, histories, tickers, as_of_timestamp_ms):
+        global _PENDING_DECISION_SNAPSHOT
+        _PENDING_DECISION_SNAPSHOT = None
+        return MEXCRankings(
+            research_longs=[],
+            research_shorts=[],
+            executable_longs=[],
+            executable_shorts=[],
+            instruments_by_key={},
+            excluded=["BOOTSTRAP_INCOMPLETE: market-cap lookup deferred until full MEXC coverage"],
+        )
     market_caps, source_report = _load_market_cap_records(symbols, now_ms)
     coverage = source_report["coverage"]
     coverage_fraction = (
