@@ -85,6 +85,28 @@ coverage_path = market_data / "data" / "reports" / "mexc" / "latest_cycle.json"
 coverage_note = ""
 if coverage_path.is_file():
     coverage = json.loads(coverage_path.read_text(encoding="utf-8"))
+    decision_bar_ms = coverage.get("latest_completed_daily_bar_ms")
+    if decision_bar_ms:
+        decision_snapshot_path = (
+            market_data / "data" / "market_cap" / "decisions"
+            / f"daily_bar_{int(decision_bar_ms)}.json"
+        )
+        if decision_snapshot_path.is_file():
+            try:
+                decision_snapshot = json.loads(
+                    decision_snapshot_path.read_text(encoding="utf-8")
+                )
+                ranked_assets = decision_snapshot.get("ranked_assets", [])
+                if not coverage.get("research_long_top"):
+                    coverage["research_long_top"] = [
+                        row for row in ranked_assets if row.get("direction") == "long"
+                    ][:10]
+                if not coverage.get("research_short_top"):
+                    coverage["research_short_top"] = [
+                        row for row in ranked_assets if row.get("direction") == "short"
+                    ][:10]
+            except (OSError, ValueError, TypeError, json.JSONDecodeError):
+                pass
     market_cap_summary = coverage.get("market_cap_source_summary") or {}
     if not market_cap_summary:
         private_cache_path = market_data / "data" / "market_cap" / "provider_cache_v2.json"
@@ -118,6 +140,16 @@ if coverage_path.is_file():
             "**🟢 ACTIVE · PAPER ONLY · NO LIVE ORDERS**",
             "**MARKET-CAP COVERAGE BLOCKED · PAPER ONLY · NO LIVE ORDERS**",
         )
+    elif (
+        str(coverage.get("paper_decision_status", "")).startswith("RETRY_EXECUTION_BLOCKED")
+        or str(coverage.get("paper_decision_status", "")).startswith("DAILY_REFRESH_BLOCKED:MEXCExecutionUnavailable")
+    ):
+        coverage_state = "EXECUTION_BLOCKED"
+        markdown = markdown.replace("# ACTIVE PAPER STATUS", "# EXECUTION BLOCKED — PAPER ONLY")
+        markdown = markdown.replace(
+            "**🟢 ACTIVE · PAPER ONLY · NO LIVE ORDERS**",
+            "**EXECUTION BLOCKED · PAPER ONLY · NO LIVE ORDERS**",
+        )
     else:
         coverage_state = "READY"
     coverage_note = "\n".join([
@@ -147,6 +179,14 @@ if coverage_path.is_file():
     ])
     if coverage.get("cycle_exception"):
         coverage_note += f"\n- Cycle error: `{coverage.get('cycle_exception')}`"
+    retry_report = coverage.get("entry_retry_report") or {}
+    if retry_report:
+        coverage_note += (
+            f"\n- Pending pair retry: \`{retry_report.get('status', 'UNKNOWN')}\`"
+            f" (attempt {retry_report.get('attempt_count', '—')})"
+        )
+        if retry_report.get("error"):
+            coverage_note += f"\n- Execution check: {retry_report['error']}"
     long_preview = coverage.get("research_long_top", [])[:10]
     if long_preview:
         coverage_note += "\n" + "\n".join(
@@ -168,7 +208,25 @@ if coverage_path.is_file():
         )
     else:
         coverage_note += "\n- No eligible negative-change candidate."
-    coverage_note += "\n\nPortfolio transitions remain blocked until the complete eligible MEXC USDT universe passes the market-data gate."
+    decision_status = str(coverage.get("paper_decision_status", ""))
+    if decision_status.startswith("RETRY_EXECUTION_BLOCKED") or decision_status.startswith("DAILY_REFRESH_BLOCKED:MEXCExecutionUnavailable"):
+        coverage_note += (
+            "\n\nThe daily ranking and selected pair remain frozen for this UTC candle. "
+            "Five-minute snapshots retry the same pair against fresh public order-book depth; "
+            "no lower-ranked substitute is opened."
+        )
+    elif coverage_state == "MARKET_CAP_BLOCKED":
+        coverage_note += (
+            "\n\nPortfolio entry remains blocked because fresh, unambiguous market-cap coverage "
+            "is below the 80% minimum."
+        )
+    elif coverage_state == "BOOTSTRAPPING":
+        coverage_note += "\n\nPortfolio entry remains blocked until MEXC history and ticker coverage pass."
+    else:
+        coverage_note += (
+            "\n\nThe daily ranking is frozen for this UTC candle. Five-minute runs update "
+            "paper NAV, funding, risk and any pending-entry retry. No live orders are submitted."
+        )
     markdown = markdown.replace("## Current performance", coverage_note + "\n\n## Current performance")
 
 (ROOT / "PAPER_STATUS.md").write_text(markdown, encoding="utf-8")
