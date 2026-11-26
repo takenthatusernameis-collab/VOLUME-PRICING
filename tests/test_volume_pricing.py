@@ -149,12 +149,13 @@ def test_coinpaprika_duplicate_stale_and_multiplier_alias_resolution(monkeypatch
             {"id": "bbb-2", "symbol": "BBB", "name": "BBB Two"},
             {"id": "ccc-id", "symbol": "CCC", "name": "CCC"},
             {"id": "pepe-id", "symbol": "PEPE", "name": "Pepe"},
+            {"id": "filecoin-id", "symbol": "FIL", "name": "Filecoin"},
         ],
     )
 
     def single_ticker(coin_id):
         stamp = now - 7 * 60 * 60 * 1000 if coin_id == "ccc-id" else now
-        symbol = "CCC" if coin_id == "ccc-id" else "PEPE"
+        symbol = "CCC" if coin_id == "ccc-id" else ("FIL" if coin_id == "filecoin-id" else "PEPE")
         return {
             "symbol": symbol,
             "name": symbol,
@@ -167,12 +168,14 @@ def test_coinpaprika_duplicate_stale_and_multiplier_alias_resolution(monkeypatch
     monkeypatch.setattr(strategy, "_fetch_coinpaprika_single_ticker", single_ticker)
 
     resolved, report = strategy._load_market_cap_records(
-        {"AAA", "BBB", "CCC", "1000PEPE"}, now
+        {"AAA", "BBB", "CCC", "1000PEPE", "FILECOIN"}, now
     )
 
-    assert set(resolved) == {"AAA", "1000PEPE"}
+    assert set(resolved) == {"AAA", "1000PEPE", "FILECOIN"}
     assert resolved["1000PEPE"]["source_symbol"] == "PEPE"
     assert resolved["1000PEPE"]["symbol_match_type"] == "mexc_1000x_denomination_alias"
+    assert resolved["FILECOIN"]["source_symbol"] == "FIL"
+    assert resolved["FILECOIN"]["symbol_match_type"] == "exact_normalized_name_alias"
     assert report["coverage"]["ambiguous_symbols"] == ["BBB"]
     assert report["coverage"]["stale_symbols"] == ["CCC"]
     assert cache_path.is_file()
