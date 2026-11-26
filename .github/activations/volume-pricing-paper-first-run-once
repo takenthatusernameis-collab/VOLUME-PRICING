@@ -6,3 +6,5 @@ CoinPaprika-only v2: full catalogue plus quota-bounded per-coin lookups; 45-day 
 Verified v2 state recovery; continue bounded MEXC history bootstrap.
 
 Bootstrap batch 2; persist crypto-only universe summary in latest status.
+
+Bootstrap batch 3; verify corrected status template and continue paper-data preparation.
