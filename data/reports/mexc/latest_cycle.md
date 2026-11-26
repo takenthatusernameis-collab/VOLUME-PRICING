@@ -1,8 +1,8 @@
 # MEXC High-Low ATH/ATL Paper Research
 
-- Run (UTC): 2026-11-26T19:02:41.080687+00:00
+- Run (UTC): 2026-11-26T19:05:51.549717+00:00
 - Active cross-margin USDT perpetuals: 1087
-- Bootstrap remaining: 337
+- Bootstrap remaining: 237
 - History coverage gate: False
 - State write mode: UNPROTECTED_SINGLE_WRITER_APPEND_ONLY
 - Paper simulation enabled: True
