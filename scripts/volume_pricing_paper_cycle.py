@@ -539,8 +539,9 @@ def _load_market_cap_records(
         }
         provider = "+".join(name for name in ("coinpaprika", "coingecko") if name in providers_used) or "none"
         attribution = "; ".join(
-            f"Powered by {provider_labels.get(name, name)}"
-            for name in providers_used
+            f"Powered by {provider_labels[name]}"
+            for name in ("coinpaprika", "coingecko")
+            if name in providers_used
         )
         coinpaprika_calls_used = 2 + individual_calls
         api_calls_used = coinpaprika_calls_used + coingecko_calls
