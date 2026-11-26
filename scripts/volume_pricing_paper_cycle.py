@@ -27,6 +27,7 @@ from high_vs_low.mexc_paper import Candidate, MEXCRankings
 ACCOUNT_ID = "mexc-usdt-forward-volume-pricing-coinpaprika-100usdt-v2"
 STRATEGY_ID = "volume-to-market-cap-first-positive-negative-coinpaprika-v2"
 INITIAL_CAPITAL = Decimal("100")
+MAX_EXECUTION_SHORTFALL_BPS = Decimal("25")
 MAX_SOURCE_AGE_MS = 6 * 60 * 60 * 1000
 MAX_TICKER_SPREAD_MS = 5 * 60 * 1000
 DAY_MS = 86_400_000
@@ -929,6 +930,8 @@ def main() -> int:
     engine.ACCOUNT_ID = ACCOUNT_ID
     engine.STRATEGY_ID = STRATEGY_ID
     engine.INITIAL_CAPITAL = INITIAL_CAPITAL
+    # Repository-local override; the shared engine default remains 10 bps elsewhere.
+    engine.MAX_SHORTFALL_BPS = MAX_EXECUTION_SHORTFALL_BPS
     engine.rank_mexc_universe = rank_volume_pricing_universe
     engine._ranking_report_rows = _ranking_report_rows
 
