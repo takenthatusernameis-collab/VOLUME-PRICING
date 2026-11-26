@@ -2,11 +2,11 @@
 
 **Primary equal-exposure account only.** This journal is reconstructed from the verified, append-only Volume Pricing event chain. It contains no alternative-path trades or shadow executions.
 
-- Account: `mexc-usdt-forward-volume-pricing-100usdt-v1`
-- Strategy generation: `volume-to-market-cap-first-positive-negative-v1`
+- Account: `mexc-usdt-forward-volume-pricing-coinpaprika-100usdt-v2`
+- Strategy generation: `volume-to-market-cap-first-positive-negative-coinpaprika-v2`
 - Starting capital: **100.00000000 USDT**
-- Generated: 2026-11-26 11:19:46 UTC
-- Latest workflow: [45808016426](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45808016426)
+- Generated: 2026-11-26 11:37:00 UTC
+- Latest workflow: [45812113812](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45812113812)
 - Recorded primary events: **0**
 
 | Timestamp (UTC) | Symbol | Side | Action | Quantity | Price | Fee (USDT) | Realized net P&L (USDT) | Funding (USDT) | Event ID |

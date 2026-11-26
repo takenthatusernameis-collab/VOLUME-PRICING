@@ -4,12 +4,12 @@
 
 **Correct workflow:** [Open active workflow](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/workflows/volume-pricing-paper-cycle.yml)
 
-- Account: `mexc-usdt-forward-volume-pricing-100usdt-v1`
-- Strategy generation: `volume-to-market-cap-first-positive-negative-v1`
+- Account: `mexc-usdt-forward-volume-pricing-coinpaprika-100usdt-v2`
+- Strategy generation: `volume-to-market-cap-first-positive-negative-coinpaprika-v2`
 - Starting capital: **100.00000000 USDT**
 - Account state: **READY — WAITING FOR FIRST FINANCIAL PAPER EVENT**
-- Last report build: 2026-11-26 11:19:46 UTC
-- Latest workflow run: [45808016426](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45808016426) · run #2, attempt 1 · failure · push
+- Last report build: 2026-11-26 11:37:00 UTC
+- Latest workflow run: [45812113812](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45812113812) · run #3, attempt 1 · success · push
 - Latest processed daily candle: —
 - Latest account event: —
 - Primary execution journal: [PAPER_TRADE_JOURNAL.md](PAPER_TRADE_JOURNAL.md)
@@ -19,12 +19,18 @@
 
 - Coverage state: **BOOTSTRAPPING**
 - Active USDT-settled cross-margin perpetuals: —
+- Strategy-eligible crypto/unclassified contracts: —
+- Excluded tokenized-stock suffix contracts: —
+- Excluded non-crypto categories: {}
 - MEXC tickers received: —
 - Missing tickers: —
 - History bootstrap remaining: —
 - API failures: —
 - Latest completed daily candle (UTC ms): —
 - Portfolio decision: `PUBLISH_READBACK_VERIFIED_AWAITING_FRESH_CHECKOUT`
+- Market-cap provider: coinpaprika — Powered by CoinPaprika
+- Fresh market-cap matches: —/—
+- CoinPaprika calls this daily decision: —/642
 
 ### Volume-to-market-cap ranking
 
