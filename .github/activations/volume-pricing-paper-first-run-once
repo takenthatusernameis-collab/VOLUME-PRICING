@@ -28,3 +28,5 @@ Provider expansion: CoinGecko keyless 2,000-asset paginated supplement; versione
 Fix and retest CoinPaprika denomination alias fallback; then evaluate combined provider coverage.
 
 Correct the CoinPaprika multiplier alias continuation and rerun the complete provider coverage tests.
+
+Align the multiplier-alias assertion with its explicit provider label and rerun all nine tests.
