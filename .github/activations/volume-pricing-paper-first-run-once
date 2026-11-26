@@ -4,3 +4,5 @@ Second activation after implementation and validation refinements.
 CoinPaprika-only v2: full catalogue plus quota-bounded per-coin lookups; 45-day MEXC history; isolated state ledger.
 
 Verified v2 state recovery; continue bounded MEXC history bootstrap.
+
+Bootstrap batch 2; persist crypto-only universe summary in latest status.
