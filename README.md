@@ -12,6 +12,8 @@ At each newly completed UTC daily candle, after the full eligible universe has c
 4. Traverse the same ranking to select the first asset with positive MEXC 24-hour price change as the long and the first asset with negative 24-hour price change as the short.
 5. If either side is unavailable or either selected contract fails paper execution checks, do not silently substitute a lower-ranked asset. Report the blocked decision.
 
+Paper execution uses a maximum modeled order-book shortfall of **25 basis points (0.25%) per leg**. This Volume Pricing-only override leaves the shared MEXC engine default at 10 bps for other strategies. Fills above 25 bps remain blocked.
+
 The market-cap data uses two no-authentication public sources. CoinPaprika Free provides 20,000 calls/month and a top-2,000 ticker list; the workflow uses its public coin catalogue and bounded individual lookups for remaining unique IDs. CoinGecko supplements missing symbols through eight `/coins/markets` pages of 250 assets each, paced 12.5 seconds apart to respect its shared 5–15 calls/minute public pool. CoinPaprika's 640-lookup/day quota guard remains in place. The portfolio still requires at least 80% fresh, unambiguous market-cap coverage; neither provider can bypass that gate. The free licences are for personal use, so raw catalogues and absolute market-cap values remain in a private Actions cache; public artifacts contain derived ratios, MEXC turnover, provider attribution and source timestamps. CoinMarketCap Keyless is restricted to evaluation/prototyping; CoinLore's site terms prohibit automated bots/data mining; CoinCap v3 requires an API key.
 
 ## Two independent performance paths
