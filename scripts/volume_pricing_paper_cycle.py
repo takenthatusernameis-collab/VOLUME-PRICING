@@ -267,6 +267,7 @@ def _load_market_cap_records(
         "provider": "coinpaprika",
     }
     _write_json_atomic(attempt_path, attempt)
+    individual_calls = 0
 
     try:
         top_rows = _fetch_coinpaprika_top_tickers()
@@ -353,7 +354,6 @@ def _load_market_cap_records(
                 f"maximum is {COINPAPRIKA_MAX_SINGLE_LOOKUPS} per daily decision"
             )
 
-        individual_calls = 0
         request_errors: list[str] = []
         for base_symbol, (coin_id, source_symbol, match_type) in pending.items():
             individual_calls += 1
@@ -419,6 +419,7 @@ def _load_market_cap_records(
             **attempt,
             "status": "FAILED",
             "completed_at_ms": int(datetime.now(UTC).timestamp() * 1000),
+            "api_calls_used": 2 + individual_calls,
             "error": f"{type(exc).__name__}: {str(exc)[:500]}",
         })
         raise
