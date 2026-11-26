@@ -176,3 +176,23 @@ def test_coinpaprika_duplicate_stale_and_multiplier_alias_resolution(monkeypatch
     assert report["coverage"]["stale_symbols"] == ["CCC"]
     assert cache_path.is_file()
     assert json.loads(attempt_path.read_text())["status"] == "COMPLETED"
+
+
+def test_market_cap_api_is_deferred_until_full_mexc_history_coverage(monkeypatch):
+    monkeypatch.setattr(strategy, "_universe_history_ready", lambda *args: False)
+
+    def forbidden_lookup(*args, **kwargs):
+        raise AssertionError("Market-cap provider must not be called during bootstrap")
+
+    monkeypatch.setattr(strategy, "_load_market_cap_records", forbidden_lookup)
+    result = strategy.rank_volume_pricing_universe(
+        [instrument(1, "AAA_USDT", "AAA")],
+        {},
+        {1: ticker("10", "0.02")},
+        Decimal("100"),
+        as_of_timestamp_ms=1_799_913_600_000,
+    )
+
+    assert result.executable_longs == []
+    assert result.executable_shorts == []
+    assert result.excluded[0].startswith("BOOTSTRAP_INCOMPLETE")
