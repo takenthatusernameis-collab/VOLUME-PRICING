@@ -72,7 +72,7 @@ Official references:
 ## Matching and quality policy
 
 1. Match MEXC base_asset to an exact uppercase CoinPaprika symbol.
-2. Prefer exact symbol matches. For MEXC denomination-prefixed contracts such as 1000BONK or 1000000MOG, remove a known multiplier prefix only when the underlying CoinPaprika symbol is unique. Record the alias rule in the ranking.
+2. Prefer exact symbol matches. For MEXC denomination-prefixed contracts such as 1000BONK or 1000000MOG, remove a known multiplier prefix only when the underlying CoinPaprika symbol is unique. If no symbol or multiplier match exists, allow an exact normalized CoinPaprika name match (for example FILECOIN to FIL) only when the provider name is unique. Record the alias rule in the ranking.
 3. Do not fuzzy-match, infer a token from a similar name, or choose an arbitrary duplicate symbol.
 4. If CoinPaprika returns multiple assets with the same symbol, mark the symbol ambiguous and exclude it.
 5. Require positive finite circulating market cap and a source timestamp no older than six hours.
