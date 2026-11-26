@@ -40,6 +40,10 @@ def caps(**values: str) -> dict[str, dict]:
     }
 
 
+def test_volume_pricing_execution_shortfall_limit_is_25_bps():
+    assert strategy.MAX_EXECUTION_SHORTFALL_BPS == Decimal("25")
+
+
 def test_ranking_uses_turnover_to_market_cap_then_direction(monkeypatch):
     rows = [
         instrument(1, "AAA_USDT", "AAA"),
