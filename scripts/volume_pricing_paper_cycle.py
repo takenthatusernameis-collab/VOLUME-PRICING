@@ -436,6 +436,7 @@ def _load_market_cap_records(
 
             if not coin_matches:
                 alias_resolved = False
+                coinpaprika_alias_found = False
                 for prefix in ("1000000", "10000", "1000"):
                     if not base_symbol.startswith(prefix):
                         continue
@@ -454,12 +455,13 @@ def _load_market_cap_records(
                         source_symbol = candidate_symbol
                         match_type = f"mexc_{prefix}x_coinpaprika_denomination_alias"
                         alias_resolved = True
+                        coinpaprika_alias_found = True
                         break
                     if len(candidate_matches) > 1:
                         ambiguous.append(base_symbol)
                         alias_resolved = True
                         break
-                if alias_resolved:
+                if alias_resolved and not coinpaprika_alias_found:
                     continue
 
                 normalized_base = _normalize_provider_name(base_symbol)
