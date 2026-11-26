@@ -1,23 +1,168 @@
+[mexc-history] resolved batch size=100 for 1087 active cross-margin perpetuals (0 configuration means full universe)
+[mexc-history] selected 100 stale instruments from 1087 active contracts for daily bar 1795564800000
+[mexc-history] checkpoint 25/100; new histories bootstrapped=25; bootstrap histories remaining=912; API failures=0
+[mexc-history] checkpoint 50/100; new histories bootstrapped=50; bootstrap histories remaining=887; API failures=0
+[mexc-history] checkpoint 75/100; new histories bootstrapped=75; bootstrap histories remaining=862; API failures=0
+[mexc-history] checkpoint 100/100; new histories bootstrapped=100; bootstrap histories remaining=837; API failures=0
+[mexc-history] batch finished: checked=100/100; new histories bootstrapped=100; bootstrap histories remaining=837; API failures=0
 {
+  "account_id": "mexc-usdt-forward-volume-pricing-coinpaprika-100usdt-v2",
+  "active_cross_margin_perpetual_count": 1087,
+  "active_cross_usdt_perpetual_count": 1087,
+  "all_time_history_daily_gap_count": 2622,
+  "all_time_history_unverified_count": 1044,
+  "all_time_history_verified_count": 43,
+  "api_failure_count": 0,
+  "api_failure_sample": [],
+  "asset_class_counts": {
+    "commodity": 13,
+    "crypto": 729,
+    "equity": 139,
+    "fx": 6,
+    "unclassified": 200
+  },
+  "bootstrap_completed_this_run": 100,
+  "bootstrap_remaining": 837,
+  "candle_rows_stored": 265354,
   "credentials_used": false,
+  "daily_decision_due": true,
+  "daily_refresh_complete": false,
+  "excluded_or_unranked_sample": [
+    "BOOTSTRAP_INCOMPLETE: market-cap lookup deferred until full MEXC coverage"
+  ],
+  "execution_long_top": [],
+  "execution_short_top": [],
+  "extreme_rankings_recalculated": true,
+  "funding_events": [],
+  "history_coverage_pass": false,
   "initial_capital_usdt": "100",
-  "mode": "STATE_PERSISTENCE_PROBE",
+  "instrument_count_all": 1180,
+  "latest_completed_daily_bar_ms": 1795564800000,
+  "lifecycle_counts": {
+    "active": 1087
+  },
+  "listing_origin_metadata_missing_count": 0,
+  "minimum_order_size_diagnostics": {
+    "contracts_satisfying_minimum_quantity_and_step": {
+      "at_10_usdt_per_leg": 1074,
+      "at_1_usdt_per_leg": 811
+    },
+    "contracts_with_minimum_notional_above_10_usdt": 13,
+    "contracts_with_minimum_notional_above_1_usdt": 276,
+    "evaluated_contracts": 1087,
+    "minimum_order_notional_usdt": {
+      "maximum": "95.4200",
+      "median": "0.27095",
+      "p10": "0.03009",
+      "p75": "1.02340",
+      "p90": "2.7153"
+    },
+    "scope_note": "Minimum quantity and lot-step affordability only; turnover, book depth, fees and shortfall remain separate execution gates.",
+    "status": "MEASURED_FROM_CURRENT_PUBLIC_TICKERS"
+  },
+  "missing_latest_bar_count": 0,
+  "missing_latest_bar_sample": [],
+  "missing_ticker_count": 0,
+  "missing_ticker_sample": [],
+  "mode": "DAILY_CLOSE_RESEARCH_AND_DECISION",
   "orders_submitted": 0,
-  "paper_account_initialized": false,
-  "paper_decision_status": "PUBLISH_READBACK_VERIFIED_AWAITING_FRESH_CHECKOUT",
-  "paper_simulation_enabled": false,
+  "ordinary_strategy_decisions": true,
+  "paper_account_initial_capital_usdt": "100",
+  "paper_account_initialized_this_cycle": true,
+  "paper_account_recovery_status": "INITIALIZED_THIS_CYCLE",
+  "paper_account_restored_from_state_branch": false,
+  "paper_decision_status": "BLOCKED_INCOMPLETE_MARKET_DATA",
+  "paper_simulation_enabled": true,
   "paper_state_write_requested": true,
+  "portfolio": {
+    "cash": "100",
+    "closed_trade_count": 0,
+    "confirmed_funding": "0",
+    "currency": "USDT",
+    "daily_equity_curve": [],
+    "daily_risk": {
+      "calendar_day_starting_nav": "100",
+      "calendar_day_starting_reference": "first_observation_of_utc_day",
+      "flatten_attempts": 0,
+      "flattened": false,
+      "peak_nav": "100",
+      "peak_timestamp_ms": 1795651200000,
+      "starting_nav": "100",
+      "starting_reference": "first_observation_of_utc_day",
+      "starting_timestamp_ms": 1795651200000,
+      "stop_reason": null,
+      "stop_triggered": false,
+      "stop_triggered_at_ms": null,
+      "utc_date": "2026-11-26"
+    },
+    "dollar_neutrality_imbalance": "0",
+    "effective_gross_leverage": "0",
+    "equity_curve": [
+      {
+        "daily_drawdown_pct": "0",
+        "daily_peak_nav": "100",
+        "daily_return_pct": "0",
+        "daily_starting_nav": "100",
+        "daily_starting_reference": "first_observation_of_utc_day",
+        "drawdown_window_reference": "first_observation_of_utc_day",
+        "drawdown_window_starting_nav": "100",
+        "emergency_stop_flattened": false,
+        "emergency_stop_newly_triggered": false,
+        "emergency_stop_triggered": false,
+        "gross_exposure": "0",
+        "long_notional_usdt": "0",
+        "nav": "100",
+        "roi_pct": "0",
+        "short_notional_usdt": "0",
+        "timestamp_ms": 1795693236164,
+        "utc_date": "2026-11-26"
+      }
+    ],
+    "fees_paid": "0",
+    "gross_exposure": "0",
+    "initial_capital": "100",
+    "lifetime_max_drawdown_pct": "0",
+    "long_margin_used_usdt": "0",
+    "long_notional_usdt": "0",
+    "nav": "100",
+    "net_exposure": "0",
+    "partial_realized_event_count": 0,
+    "partial_realized_net_pnl": "0",
+    "performance": {
+      "metrics": {},
+      "observations": 0,
+      "status": "INSUFFICIENT_DAILY_EQUITY_HISTORY"
+    },
+    "position_count": 0,
+    "positions": [],
+    "realized_gross_pnl": "0",
+    "roi_pct": "0",
+    "short_margin_used_usdt": "0",
+    "short_notional_usdt": "0",
+    "total_margin_used_usdt": "0",
+    "unrealized_pnl": "0"
+  },
   "private_endpoints_used": false,
   "provider": "mexc",
-  "run_utc": "2026-11-26T11:36:57.523277+00:00",
-  "state_recovery_probe": {
-    "batch_hash": "80cdbe8dcc3d744d48ddaf7451e41844818c69093b06b5b6adb85a7765b06ed1",
-    "commit_sha": "9e6d9281f31e0f7870440b4353a17133b9e31734",
+  "research_long_top": [],
+  "research_refresh_performed": true,
+  "research_short_top": [],
+  "run_utc": "2026-11-26T11:40:43.956890+00:00",
+  "snapshot_partition": "../market-data/data/snapshots/2026-11-26/11.jsonl.gz",
+  "state_event": {
+    "batch_hash": "30fc4790a63d8ead64d02892c2b6897cf13d2cfe477def8325c4ccbdc017caca",
+    "commit_sha": "f5efad4d9b0dab94ae3dfa6a6fe4543e2a5af30e",
     "created": true,
-    "fresh_checkout_recovery_required": true,
-    "path": "events/2026/11/state-probe-1795693011274.json",
-    "remote_readback_verified": true
+    "path": "events/2026/11/account-init-1795693236164.json"
   },
+  "state_recovery_probe_verified_from_prior_checkout": true,
   "state_write_mode": "UNPROTECTED_SINGLE_WRITER_APPEND_ONLY",
-  "wallet_used": false
+  "stop_exits": [],
+  "ticker_count": 1189,
+  "ticker_coverage": 1087,
+  "trailing_stop_updates": [],
+  "unresolved_funding_count": 0,
+  "wallet_used": false,
+  "workflow_mode": "DAILY_CLOSE_RESEARCH_AND_DECISION"
 }
+[volume-pricing-bootstrap] History is still being collected; portfolio changes remain blocked.
