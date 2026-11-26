@@ -378,3 +378,24 @@ def test_ranking_report_serializes_close_price_without_binary_float():
     assert isinstance(row["completed_daily_close"], str)
     assert row["distance_pct"] == "0.25"
     assert row["extreme_price"] is None
+
+
+def test_daily_ranking_runs_once_per_completed_bar_after_snapshot_is_persisted(tmp_path):
+    decision_dir = tmp_path / "data" / "market_cap" / "decisions"
+    decision_dir.mkdir(parents=True)
+    (decision_dir / "daily_bar_123.json").write_text("{}", encoding="utf-8")
+    calls = []
+
+    def original_due(manifest, latest_bar_ms):
+        calls.append(latest_bar_ms)
+        return True
+
+    assert strategy._volume_pricing_daily_refresh_due(
+        original_due, {}, 123, tmp_path
+    ) is False
+    assert calls == []
+
+    assert strategy._volume_pricing_daily_refresh_due(
+        original_due, {}, 456, tmp_path
+    ) is True
+    assert calls == [456]
