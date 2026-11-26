@@ -354,6 +354,8 @@ def test_ranking_report_serializes_close_price_without_binary_float():
         symbol="mexc:1",
         direction="long",
         close_price=1.2345,
+        distance_pct=0.25,
+        extreme_price=None,
         decision_timestamp_ms=1_800_000_000_000,
     )
     instrument_row = {
@@ -374,3 +376,5 @@ def test_ranking_report_serializes_close_price_without_binary_float():
 
     assert row["completed_daily_close"] == "1.2345"
     assert isinstance(row["completed_daily_close"], str)
+    assert row["distance_pct"] == "0.25"
+    assert row["extreme_price"] is None
