@@ -8,10 +8,10 @@
 - Strategy generation: `volume-to-market-cap-first-positive-negative-coinpaprika-v2`
 - Starting capital: **100.00000000 USDT**
 - Account state: **INITIALIZED — FORWARD PAPER**
-- Last report build: 2026-11-26 20:09:30 UTC
-- Latest workflow run: [45888841695](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45888841695) · run #26, attempt 1 · success · schedule
+- Last report build: 2026-11-26 20:10:46 UTC
+- Latest workflow run: [45889037073](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45889037073) · run #27, attempt 1 · success · workflow_dispatch
 - Latest processed daily candle: 2026-11-25 00:00 UTC
-- Latest account event: 2026-11-26 20:09:08 UTC
+- Latest account event: 2026-11-26 20:10:30 UTC
 - Primary execution journal: [PAPER_TRADE_JOURNAL.md](PAPER_TRADE_JOURNAL.md)
 
 
@@ -22,12 +22,12 @@
 - Strategy-eligible crypto/unclassified contracts: —
 - Excluded tokenized-stock suffix contracts (overlaps category counts): —
 - Excluded non-crypto categories: {}
-- MEXC tickers received: 0
-- Missing tickers: 2
+- MEXC tickers received: 2
+- Missing tickers: 0
 - History bootstrap remaining: not refreshed in snapshot mode
 - API failures: 0
 - Latest completed daily candle (UTC ms): 1795564800000
-- Portfolio decision: `RETRY_PAIR_REBUILT`
+- Portfolio decision: `MONITORING_ONLY_NO_STRATEGY_DECISIONS`
 - Market-cap provider: coinpaprika+coingecko — Powered by CoinPaprika; Powered by CoinGecko
 - Fresh market-cap matches: 514/611
 - Market-cap API calls: CoinPaprika 13/642; CoinGecko 8/8
@@ -37,7 +37,6 @@
 Numerator: MEXC rolling 24-hour USDT quote turnover. Denominator: circulating market capitalization in USD.
 
 **Highest-ranked positive 24-hour change candidates (long side):**
-- Pending pair retry: \`RETRY_PAIR_REBUILT\` (attempt 5)
 - ANTHROPIC_USDT: ratio=786.9282990471105548999670127%, MEXC 24h change=0.0045, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
 - LAB_USDT: ratio=41.58089691685163016614432339%, MEXC 24h change=0.0105, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
 - INIT_USDT: ratio=41.17441566171532285569618224%, MEXC 24h change=0.0344, market-cap source=coinpaprika match=exact_coinpaprika_top_2000
@@ -68,17 +67,17 @@ The daily ranking is frozen for this UTC candle. Five-minute runs update paper N
 | Metric | Value |
 |---|---:|
 | Initial capital | 100.00000000 USDT |
-| **NAV** | **99.72424180 USDT** |
-| Total return | -0.276% |
+| **NAV** | **99.51752180 USDT** |
+| Total return | -0.482% |
 | Cash | 99.98010180 USDT |
-| Unrealized P&L | -0.25586000 USDT |
+| Unrealized P&L | -0.46258000 USDT |
 | Fees paid | 0.01989820 USDT |
 | Confirmed funding | +0.00000000 USDT |
-| Gross exposure | 2.003× NAV |
-| Net exposure | 0.003× NAV |
-| Current drawdown from risk-window peak | +0.000% |
-| Lifetime / cross-session maximum drawdown | +0.000% |
-| Worst risk-session maximum drawdown | +0.000% |
+| Gross exposure | 2.009× NAV |
+| Net exposure | 0.001× NAV |
+| Current drawdown from risk-window peak | -0.207% |
+| Lifetime / cross-session maximum drawdown | -0.482% |
+| Worst risk-session maximum drawdown | -0.207% |
 | Sharpe ratio | Unavailable — sample gate not met |
 | Sortino ratio | Unavailable — sample gate not met |
 | Annualized daily volatility | Unavailable — sample gate not met |
@@ -88,13 +87,14 @@ The daily ranking is frozen for this UTC candle. Five-minute runs update paper N
 | Session start (UTC) | Starting NAV | Latest NAV | Max drawdown | Marks |
 |---|---:|---:|---:|---:|
 | 2026-11-26 00:00:00 UTC | 100.00000000 | 100.00000000 | +0.000% | 15 |
+| 2026-11-26 20:09:16 UTC | 99.72424180 | 99.51752180 | -0.207% | 1 |
 
 ## Open positions
 
 | Symbol | Side | Quantity | Entry price | Mark | Notional (USDT) |
 |---|---|---:|---:|---:|---:|
-| ANTHROPIC_USDT | long | 1.186 | 84.32 | 84.31 | 99.991660 |
-| BULLA_USDT | short | 3050 | 0.03262 | 0.0327 | 99.735000 |
+| ANTHROPIC_USDT | long | 1.186 | 84.32 | 84.29 | 99.967940 |
+| BULLA_USDT | short | 3050 | 0.03262 | 0.03276 | 99.918000 |
 
 ## Primary path — equal exposure
 
