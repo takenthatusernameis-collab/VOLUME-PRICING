@@ -73,7 +73,7 @@ Official references:
 1. Match MEXC base_asset to an exact uppercase CoinPaprika symbol.
 2. Do not fuzzy-match, infer a token from a similar name, or choose an arbitrary duplicate symbol.
 3. If CoinPaprika returns multiple assets with the same symbol, mark the symbol ambiguous and exclude it.
-4. Require positive finite circulating market cap and a source timestamp no older than 24 hours.
+4. Require positive finite circulating market cap and a source timestamp no older than six hours.
 5. Require at least 80% fresh, unambiguous market-cap coverage across distinct eligible MEXC base-asset symbols; otherwise fail closed and do not update the portfolio.
 6. Use MEXC turnover_24h_quote for the numerator and treat USDT as approximately USD 1:1.
 7. Persist the daily ranking, derived ratio, MEXC turnover, provider attribution and source timestamp. Do not persist the raw provider catalogue or absolute market-cap values.
