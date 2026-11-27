@@ -8,20 +8,20 @@
 - Strategy generation: `volume-to-market-cap-first-positive-negative-coinpaprika-v2`
 - Starting capital: **100.00000000 USDT**
 - Account state: **INITIALIZED — FORWARD PAPER**
-- Last report build: 2026-11-27 11:32:08 UTC
-- Latest workflow run: [45990817679](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45990817679) · run #30, attempt 1 · failure · schedule
+- Last report build: 2026-11-27 20:17:00 UTC
+- Latest workflow run: [46062182971](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/46062182971) · run #31, attempt 1 · failure · schedule
 - Latest processed daily candle: 2026-11-25 00:00 UTC
-- Latest account event: 2026-11-27 11:31:50 UTC
+- Latest account event: 2026-11-27 20:16:43 UTC
 - Primary execution journal: [PAPER_TRADE_JOURNAL.md](PAPER_TRADE_JOURNAL.md)
 
 
 ## MEXC universe and data coverage
 
 - Coverage state: **BOOTSTRAPPING**
-- Active USDT-settled cross-margin perpetuals: 1087
+- Active USDT-settled cross-margin perpetuals: 1090
 - Strategy-eligible crypto/unclassified contracts: 611
-- Excluded tokenized-stock suffix contracts (overlaps category counts): 446
-- Excluded non-crypto categories: {'commodity': 13, 'equity': 139, 'fx': 6}
+- Excluded tokenized-stock suffix contracts (overlaps category counts): 448
+- Excluded non-crypto categories: {'commodity': 13, 'equity': 142, 'fx': 6}
 - MEXC tickers received: 2
 - Missing tickers: 0
 - History bootstrap remaining: 0
@@ -89,7 +89,7 @@ Portfolio entry remains blocked until MEXC history and ticker coverage pass.
 |---|---:|---:|---:|---:|
 | 2026-11-26 00:00:00 UTC | 100.00000000 | 100.00000000 | +0.000% | 15 |
 | 2026-11-26 20:09:16 UTC | 99.72424180 | 101.30686180 | -0.207% | 2 |
-| 2026-11-27 00:00:00 UTC | 101.30686180 | -48.56441380 | -147.938% | 2 |
+| 2026-11-27 00:00:00 UTC | 101.30686180 | -48.56441380 | -147.938% | 3 |
 
 ## Open positions
 
