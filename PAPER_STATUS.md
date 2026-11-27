@@ -8,10 +8,10 @@
 - Strategy generation: `volume-to-market-cap-first-positive-negative-coinpaprika-v2`
 - Starting capital: **100.00000000 USDT**
 - Account state: **INITIALIZED — FORWARD PAPER**
-- Last report build: 2026-11-27 02:53:12 UTC
-- Latest workflow run: [45930631040](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45930631040) · run #29, attempt 1 · failure · schedule
+- Last report build: 2026-11-27 11:32:08 UTC
+- Latest workflow run: [45990817679](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/45990817679) · run #30, attempt 1 · failure · schedule
 - Latest processed daily candle: 2026-11-25 00:00 UTC
-- Latest account event: 2026-11-27 02:52:44 UTC
+- Latest account event: 2026-11-27 11:31:50 UTC
 - Primary execution journal: [PAPER_TRADE_JOURNAL.md](PAPER_TRADE_JOURNAL.md)
 
 
@@ -77,8 +77,8 @@ Portfolio entry remains blocked until MEXC history and ticker coverage pass.
 | Gross exposure | 0.000× NAV |
 | Net exposure | 0.000× NAV |
 | Current drawdown from risk-window peak | -147.938% |
-| Lifetime / cross-session maximum drawdown | -146.162% |
-| Worst risk-session maximum drawdown | -146.162% |
+| Lifetime / cross-session maximum drawdown | -147.938% |
+| Worst risk-session maximum drawdown | -147.938% |
 | Sharpe ratio | Unavailable — sample gate not met |
 | Sortino ratio | Unavailable — sample gate not met |
 | Annualized daily volatility | Unavailable — sample gate not met |
@@ -89,7 +89,7 @@ Portfolio entry remains blocked until MEXC history and ticker coverage pass.
 |---|---:|---:|---:|---:|
 | 2026-11-26 00:00:00 UTC | 100.00000000 | 100.00000000 | +0.000% | 15 |
 | 2026-11-26 20:09:16 UTC | 99.72424180 | 101.30686180 | -0.207% | 2 |
-| 2026-11-27 00:00:00 UTC | 101.30686180 | -46.76575820 | -146.162% | 1 |
+| 2026-11-27 00:00:00 UTC | 101.30686180 | -48.56441380 | -147.938% | 2 |
 
 ## Open positions
 
