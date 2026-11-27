@@ -1,7 +1,7 @@
-[mexc-history] resolved batch size=100 for 1087 active cross-margin perpetuals (0 configuration means full universe)
-[mexc-history] selected 100 stale instruments from 1087 active contracts for daily bar 1795651200000
-[mexc-history] checkpoint 25/100; new histories bootstrapped=0; bootstrap histories remaining=0; API failures=0
-[mexc-history] checkpoint 50/100; new histories bootstrapped=0; bootstrap histories remaining=0; API failures=0
-[mexc-history] checkpoint 75/100; new histories bootstrapped=0; bootstrap histories remaining=0; API failures=0
-[mexc-history] checkpoint 100/100; new histories bootstrapped=0; bootstrap histories remaining=0; API failures=0
-[mexc-history] batch finished: checked=100/100; new histories bootstrapped=0; bootstrap histories remaining=0; API failures=0
+[mexc-history] resolved batch size=100 for 1090 active cross-margin perpetuals (0 configuration means full universe)
+[mexc-history] selected 100 stale instruments from 1090 active contracts for daily bar 1795651200000
+[mexc-history] checkpoint 25/100; new histories bootstrapped=0; bootstrap histories remaining=3; API failures=0
+[mexc-history] checkpoint 50/100; new histories bootstrapped=0; bootstrap histories remaining=3; API failures=0
+[mexc-history] checkpoint 75/100; new histories bootstrapped=0; bootstrap histories remaining=3; API failures=0
+[mexc-history] checkpoint 100/100; new histories bootstrapped=3; bootstrap histories remaining=0; API failures=0
+[mexc-history] batch finished: checked=100/100; new histories bootstrapped=3; bootstrap histories remaining=0; API failures=0

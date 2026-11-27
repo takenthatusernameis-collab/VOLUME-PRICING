@@ -1,5 +1,5 @@
 {
-  "last_run_utc": "2026-11-27T11:31:50.270000+00:00",
+  "last_run_utc": "2026-11-27T20:16:43.654000+00:00",
   "portfolio_state": {
     "account_id": "mexc-usdt-forward-volume-pricing-coinpaprika-100usdt-v2",
     "cash": "-48.564413800",
@@ -388,13 +388,32 @@
         "short_notional_usdt": "0",
         "timestamp_ms": 1795779110270,
         "utc_date": "2026-11-27"
+      },
+      {
+        "daily_drawdown_pct": "-147.9379312882831792544974481",
+        "daily_peak_nav": "101.306861800",
+        "daily_return_pct": "-147.9379312882831792544974481",
+        "daily_starting_nav": "101.306861800",
+        "daily_starting_reference": "previous_utc_day_last_snapshot",
+        "drawdown_window_reference": "previous_utc_day_last_snapshot",
+        "drawdown_window_starting_nav": "101.306861800",
+        "emergency_stop_flattened": true,
+        "emergency_stop_newly_triggered": false,
+        "emergency_stop_triggered": true,
+        "gross_exposure": null,
+        "long_notional_usdt": "0",
+        "nav": "-48.564413800",
+        "roi_pct": "-148.564413800",
+        "short_notional_usdt": "0",
+        "timestamp_ms": 1795810603654,
+        "utc_date": "2026-11-27"
       }
     ],
     "fees_paid": "0.069893800",
     "initial_capital": "100",
     "last_decision_attempt_daily_bar_ms": 1795564800000,
     "last_processed_daily_bar_ms": null,
-    "last_snapshot_ms": 1795779110270,
+    "last_snapshot_ms": 1795810603654,
     "partial_realized_net_pnls": [],
     "pending_entry_signal": null,
     "positions": [],
@@ -406,9 +425,9 @@
   },
   "schema_version": 1,
   "state_event": {
-    "batch_hash": "b170eb2283d002666b378ef2016e07b5e97c40b73d65fd970feb71fe487031b3",
-    "commit_sha": "d46a64ab22fcaf36c218895b67971cd1eeb91cce",
+    "batch_hash": "9e026372532a26d1f6713409a969401d4bbd3a5360c9dd6e40b5aa1e7d5a4336",
+    "commit_sha": "ff5a8ad72b50bac822c760ad8ccc24fe3532af58",
     "created": true,
-    "path": "events/2026/11/risk-1795779110270.json"
+    "path": "events/2026/11/risk-1795810603654.json"
   }
 }

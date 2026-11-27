@@ -1,5 +1,5 @@
 {
-  "active_cross_usdt_perpetual_count": 1087,
+  "active_cross_usdt_perpetual_count": 1090,
   "api_failure_count": 0,
   "bootstrap_remaining": 0,
   "credentials_used": false,
@@ -13,7 +13,7 @@
   "execution_short_top": [],
   "extreme_rankings_recalculated": false,
   "funding_events": [],
-  "generated_at_ms": 1795779126159,
+  "generated_at_ms": 1795810618554,
   "history_coverage_pass": false,
   "latest_completed_daily_bar_ms": 1795564800000,
   "market_cap_coverage_pass": false,
@@ -474,14 +474,14 @@
   },
   "state_write_mode": "UNPROTECTED_SINGLE_WRITER_APPEND_ONLY",
   "strategy_universe_summary": {
-    "all_usdt_perpetuals": 1087,
+    "all_usdt_perpetuals": 1090,
     "eligible_crypto_and_unclassified": 611,
     "excluded_by_category": {
       "commodity": 13,
-      "equity": 139,
+      "equity": 142,
       "fx": 6
     },
-    "excluded_stock_suffix_contracts": 446
+    "excluded_stock_suffix_contracts": 448
   },
   "ticker_coverage": 2,
   "unresolved_funding_count": 0,
