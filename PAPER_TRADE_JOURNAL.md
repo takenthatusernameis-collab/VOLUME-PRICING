@@ -5,8 +5,8 @@
 - Account: `mexc-usdt-forward-volume-pricing-coinpaprika-100usdt-v2`
 - Strategy generation: `volume-to-market-cap-first-positive-negative-coinpaprika-v2`
 - Starting capital: **100.00000000 USDT**
-- Generated: 2026-11-28 02:50:04 UTC
-- Latest workflow: [46099518872](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/46099518872)
+- Generated: 2026-11-28 10:58:42 UTC
+- Latest workflow: [46137438806](https://github.com/takenthatusernameis-collab/VOLUME-PRICING/actions/runs/46137438806)
 - Recorded primary events: **4**
 
 | Timestamp (UTC) | Symbol | Side | Action | Quantity | Price | Fee (USDT) | Realized net P&L (USDT) | Funding (USDT) | Event ID |
